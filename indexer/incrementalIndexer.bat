@@ -1,0 +1,1 @@
+java -classpath ".;jython.jar;marc4j.jar" org.python.util.jython horizonIncrementalIndexer.py %1

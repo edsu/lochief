@@ -1,0 +1,51 @@
+<html><head>
+	<title>{% block title %}Seattle Public Library{% endblock %}</title>
+	<style> .record { width: 99%; border-bottom: 1px solid #b3b9bf;  }
+		.jacket { float: left; }
+		.topbar { padding: 5px; border-bottom: 1px solid #b3b9bf; /*background-color: #d1e0ef;*/ margin-bottom: 5px;}
+		.facets {  width: 22%; float:left; clear:left; font-size:80%; background-color: #d1e0ef; border: 1px solid #b3b9bf; font-family:arial; padding: 5px;}
+		.facet-list { margin-bottom: 5px;}
+		.results { width: 75%; float: left; clear: right; margin-left: 3px; }
+		.facets a { color: #00f; text-decoration:none; }
+		.author { clear: right; }
+		.logo { font-family:verdana,georgia; color: #0063dc; font-size: 120%; letter-spacing: .1em; padding-right: 10px; }
+		.logo a, .page-num a, .author a, .publisher a, .logo img  { text-decoration: none; border:none;}
+		.logo a:visited { color: #0063dc;}
+		.beta {color: #d1d1d1; vertical-align:super; font-size:70%;}
+		ul { list-style: none; margin: 0; padding-left: 1em; text-indent: -1em; }
+		.searchbutton { background-color: #d1e0ef; border: 1px solid #47a;}
+		.pagination { clear:both; width:auto; margin-top: 10px; padding: 10px; text-align: right; float:right;}
+		.prev-next-top { text-align: right; }
+		.pagination a:hover , .prev-next-top a:hover { background-color: #d1e0ef; }
+		.page-num { padding: 10px;}
+		.searchform img { vertical-align: text-bottom;} </style>
+	<script>function $() { 
+		  	var elements = new Array();
+			for (var i = 0; i < arguments.length; i++) {
+			    var element = arguments[i];
+			    if (typeof element == 'string') { element = document.getElementById(element); }
+			    if (arguments.length == 1) { return element; }
+			    elements.push(element);
+	  		}
+		  return elements; };
+		var setFocus = function() { document.s.q.focus(); };	
+		var doSort = function() {
+			var sortIndex = document.sortForm.sortField.selectedIndex;
+			window.location = document.sortForm.sortField[sortIndex].value; };
+		var showMore = function( facetCode ) {
+			$("facet-list-ext-" + facetCode).style.display = "block";
+			$('showmore-' + facetCode).style.display = "none"; };
+	</script>
+</head>
+<body {% block bodyonload %}onload="setFocus();"{% endblock %}>
+	{% block body %}<br /><br />
+		<center><h2>
+			<span class="logo"><img src="http://www.spl.org/images/g_spl_logo.gif" /></span>
+			</h2>
+		<form name="s" method="GET" action = "/catalog/search/">
+			<input type="text" id="id_term" name="q" size="20" maxlength="40" value="" />
+			<input type="submit" value="Search" class="searchbutton" />		
+		</form>
+	</center>{% endblock %}
+</body>
+</html>
