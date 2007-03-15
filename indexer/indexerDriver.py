@@ -17,6 +17,7 @@ SOLR_BASE_URL = indexerConfig.get("SOLR_BASE_URL", "http://localhost:8888/solr" 
 SOLR_UPDATE_URL = indexerConfig.get( "SOLR_UPDATE_URL" )
 SOLR_QUERY_URL = indexerConfig.get( "SOLR_QUERY_URL" ) 
 MAX_RECORDS_TO_ADD = indexerConfig.get("MAX_RECORDS_TO_ADD")
+RECORDS_TO_SKIP = indexerConfig.get("RECORDS_TO_SKIP")
 SOLR_INDEX_BATCH_SIZE = indexerConfig.get("SOLR_INDEX_BATCH_SIZE")
 SOLR_COMMIT_BATCH_SIZE = indexerConfig.get("SOLR_COMMIT_BATCH_SIZE")
 PRINT_SOLR_POST_DATA = indexerConfig.get("PRINT_SOLR_POST_DATA")
@@ -35,12 +36,15 @@ def postURL( url, data, contentType="""text/xml; charset="utf-8" """ ):
     osw.write( data )
     osw.flush()
     osw.close()
-    br = BufferedReader( InputStreamReader( hu.getInputStream() ) )
     lineOn = ""
     ret = ""
-    while lineOn is not None:
-        ret += lineOn
-        lineOn = br.readLine()
+    try:
+        br = BufferedReader( InputStreamReader( hu.getInputStream() ) )
+	while lineOn is not None:
+	    ret += lineOn
+	    lineOn = br.readLine()
+    except:
+        print "Post failed for following record:\n%s" % data
     return ret
 
 def optimize(url =SOLR_UPDATE_URL):
@@ -94,6 +98,8 @@ def processFile( filename, anselUnicodeConverter = None ):
                 print "tried parsing again and failed. The lesson is, never try."
                 sys.exit(1)
         mrsTime = time.time()
+        if count < RECORDS_TO_SKIP:
+            continue
         rec = recordForSolr( marc4jRecord, anselUnicodeConverter, config = indexesConfig )
         marcRecordForSolrTime += ( time.time() - mrsTime )
         extractionTime += rec._extractionTime

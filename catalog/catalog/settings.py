@@ -17,7 +17,7 @@ CACHE_BACKEND = 'locmem:///'
 
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1 
-MEDIA_URL = 'http://localhost:8000/site_media'
+MEDIA_URL = 'http://localhost:8008/site_media'
 ADMIN_MEDIA_PREFIX = '/media/'
 
 SECRET_KEY = 'g&4kmzrz@5#o&zi13490jmklsrklqiwer5mlze(j*9cxoia6j-2aji!'
@@ -39,7 +39,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
-     "c:/projects/helios/savitr/templates",
+#     "c:/projects/helios/savitr/templates",
  )
 
 INSTALLED_APPS = ( 'catalog', )

@@ -1,9 +1,9 @@
-SOLR_SERVER = "dev7:8888"
+SOLR_SERVER = "localhost:8983"
 SEARCH_CACHE_TIME = 6000    # in seconds
 ITEMS_PER_PAGE = 10
 MAX_FACET_TERMS_BASIC = 4    # how many facet terms display by default
 MAX_FACET_TERMS_EXPANDED = 25 # how many facet terms display when you hit "show more"
-OPAC_FULL_BIB_URL = "http://catalog.spl.org/ipac20/ipac.jsp?index=BIB&term=%(bib_num)s"
+OPAC_FULL_BIB_URL = "http://sirsiweb.laurentian.ca/uhtbin/cgisirsi/x/x/x/57/5/?user_id=WEBSERVER&searchdata1=%(bib_num)s{001}"
 FACETS = [    { 'name' : 'Subject: Topic', 'code' : 'topic' },    
               { 'name' : 'Subject: Genre', 'code' : 'genre' },                            
               { 'name' : 'Format', 'code' : 'format' },                        

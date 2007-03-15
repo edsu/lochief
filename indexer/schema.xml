@@ -8,7 +8,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="example" version="1.1">
+<schema name="osndeka" version="1.1">
   <types>
     <!-- field type definitions. The "name" attribute is
          just a label to be used by field definitions.  The "class"
@@ -170,7 +170,8 @@
 
    
 <!-- begin added csd 9.12.2006 -->
-	<field name="bib_num" type="sint" indexed="true" stored="true" /> <!-- sint == sortable int -->
+	<field name="bib_num" type="text" indexed="true" stored="true" /> <!-- sint == sortable int -->
+	<!--<field name="bib_num" type="sint" indexed="true" stored="true" /> --> <!-- sint == sortable int --> 
 	<field name="title" type="text" indexed="true" stored="true" />
     
 	<field name="author" type="text" indexed="true" stored="true" multiValued="true" />
@@ -214,6 +215,7 @@
 	<field name="location" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="collection" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="deweyClass" type="string" indexed="true" stored="true" multiValued="true" />
+	<field name="LCClass" type="string" indexed="true" stored="true" multiValued="true" />
 	<!-- end item info -->
 	
 	<!-- this stores a serialized python object containing the marc record -->

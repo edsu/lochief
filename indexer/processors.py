@@ -26,6 +26,13 @@ def deweyClassProcessor( record, marcMap=None, extractor=None):
                 return numsOn[:3]
     return None
 
+def LCClassProcessor( record, marcMap=None, extractor=None):
+    callNum = extractor.extract( marcMap )
+    if len(callNum) > 0:
+        callNum = callNum[0] # TODO: make it able to handle multiple call numbers
+        return callNum
+    return None
+
 def pubdateProcessor( record, marcMap=None, extractor=None):
     import re
     pubdate = extractor.extract(marcMap)

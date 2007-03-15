@@ -25,7 +25,7 @@ class MarcExtractor:
                         for subfieldOn in subfields:
                             if fieldOn.has_key( "%s" % subfieldOn ):
                                 sfOn = fieldOn[subfieldOn].strip()
-                                if stripTrailingPunctuation and sfOn[-1] in trailingPunctuationToStrip:
+                                if stripTrailingPunctuation and sfOn and sfOn[-1] in trailingPunctuationToStrip:
                                     sfOn = sfOn[:-1]
                                 subfieldsToAdd.append( sfOn )
                         if len(subfieldsToAdd) > 0:

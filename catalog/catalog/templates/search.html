@@ -1,9 +1,9 @@
 {% extends "index.html" %}
-{% block title %}Seattle Public Library: Search on {{q}}{% endblock %}
+{% block title %}Laurentian University Library: Search on {{q}}{% endblock %}
 {% block body %}
 		<div class="searchform">
 		<form name="s" method="GET" action = "/catalog/search">
-			<span class="logo"><a href="/catalog/"><img src="http://catalog.spl.org/hipres/logos/SPL_horiz_sm_color4.gif" /></a></span> 
+			<span class="logo"><a href="/catalog/"><img src="http://www.laurentian.ca/Laurentian.WCMSPortal/Inc/images/logo_laurentian.jpg" /></a></span> 
 			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
 			<select name="index" id="id_index"> 
 				{% for indexOn in indexes %}
@@ -104,6 +104,14 @@
 		<div class="publisher">
 			<a href='/catalog/search/?q={{docOn.publisher}}&index=publisher'>{{docOn.publisher}}</a> 
 			{%if docOn.pubdate %}: {% endif %}<a href='/catalog/search/?q={{docOn.pubdate}}&index=pubdate'>{{docOn.pubdate}}</a>
+		</div>
+		<div class="callnum">
+			{%if docOn.LCClass %}
+				{%for LCNum in docOn.LCClass %}Call number: {{LCNum}}{% if not forloop.last %},{% endif %}{% endfor %}
+			{% endif %}
+			{%if docOn.DeweyClass %}
+				{%for DeweyNum in docOn.DeweyClass %}Call number: {{DeweyNum}}{% if not forloop.last %},{% endif %}{% endfor %}
+			{% endif %}
 		</div>
 	</td>
 	<td align="right">{{ docOn.format_icon_url }}</td>
