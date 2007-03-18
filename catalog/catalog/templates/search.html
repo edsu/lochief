@@ -113,6 +113,13 @@
 				{%for DeweyNum in docOn.DeweyClass %}Call number: {{DeweyNum}}{% if not forloop.last %},{% endif %}{% endfor %}
 			{% endif %}
 		</div>
+		{% if docOn.url %}
+			{%for url in docOn.url %}
+		<div class="url">
+			<a href="{{url}}">Online resource</a>
+		</div>
+			{% endfor %}
+		{% endif %}
 	</td>
 	<td align="right">{{ docOn.format_icon_url }}</td>
 	</tr>
