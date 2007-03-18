@@ -10,10 +10,19 @@ from processors import *
 import time
 
 class MarcExtractor:
+    '''
+    This class extracts MARC records.
+    '''
+
     def __init__(self, marcRecord):
         if type( marcRecord ) == type(""): marcRecord = eval(marcRecord)
         self.marcRecord = marcRecord
+
     def extract(self, extractString, dedupe=1, stripTrailingPunctuation = 1, trailingPunctuationToStrip = [".", ","], separator = " " ):
+        '''
+        Generic extractor of subfields from a MARC field.
+        Returns an array of the subfields and their values.
+        '''
         ret = []
         thingsToExtract = [x.strip() for x in extractString.split(",") ]
         for extractStringOn in thingsToExtract:
@@ -51,6 +60,7 @@ class MarcExtractor:
                             except IndexError:
                                 pass
         return ret 
+
 def marcRecordToDict( marcRecord, converter ):
     """takes in a marc4j marc record and converts it to a python dict object"""
     controlFields = marcRecord.getControlFields() 
@@ -74,6 +84,7 @@ def marcRecordToDict( marcRecord, converter ):
         else: 
             ret[tagName] = [fieldAsDict]
     return ret
+
 class recordForSolr:
     """takes a marc record in dict format and processes it using the configurations specified in 
     indexes.properties"""
