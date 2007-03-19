@@ -22,7 +22,7 @@
 			<td align="right" valign="center">
 				<form name="sortForm"><strong>Sort by:</strong>
 					<select name="sortField" onchange="doSort()">
-						<option value="?q={{q}}&limit={{currentLimit}}">Relevance</option>
+						<option value="?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}">Relevance</option>
 						{% for sortOn in sorts %}
 							<option {% if sortOn.selected %}selected="true"{% endif %} value='?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{sortOn.field}}%20{{sortOn.direction}}'>{{sortOn.name}}</option>
 						{% endfor %}
@@ -130,17 +130,17 @@
 <br clear="all" />
 <div class="pagination">
 		{% if pagination.hasPrevious %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
 		{% endif %}	
 		{% for pageOn in pagination.pages %}
 			{% if pageOn.selected %}
 				<span class="selected page-num">{{pageOn.pageLabel}}</span>
 			{% else %}
-				<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pageOn.page}}' title="results {{pageOn.start}} to {{pageOn.end}}">{{pageOn.pageLabel}}</a></span>
+				<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pageOn.page}}' title="results {{pageOn.start}} to {{pageOn.end}}">{{pageOn.pageLabel}}</a></span>
 			{% endif %}
 		{% endfor %}
 		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>Next&nbsp;&raquo;</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>Next&nbsp;&raquo;</a></span>
 		{% endif %}	
 </div>
 {% endif %}
