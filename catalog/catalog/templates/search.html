@@ -99,7 +99,7 @@
 		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
 		<div class="author">
 			{% if docOn.author %}
-				by {% for authorOn in docOn.author %}<a href='/catalog/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+				{%trans "by" %} {% for authorOn in docOn.author %}<a href='/catalog/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %}; {% endif %}{% endfor %}
 			{% endif %}
 		</div>
 		<div class="publisher">
