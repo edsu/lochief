@@ -20,6 +20,16 @@ def makeSearchString(q, index, limits, sort):
 
 def search(req):
     start = time.time()
+    ctx = getResults(req)
+    # render using appropriate format
+    if ctx['format'] and ctx['format'] == "py": 
+        resp = HttpResponse( pprint.pformat(ctx) )
+        resp.headers['Content-Type'] = "text/plain" ; return resp
+    else:
+        ctx['response_time'] = "%.4f" % ( time.time() - start )
+        return render_to_response("search.html", ctx )
+
+def getResults(req): 
     q = req.GET.get('q', None) 
     searchString = q
     limits = []
@@ -47,6 +57,8 @@ def search(req):
         data = urllib.urlopen( urlToGet ).read()
         cache.set( cacheKey, data, SEARCH_CACHE_TIME )
     ctx = eval(data)    
+    ctx['format'] = format;
+    print ctx
     numFound = ctx['response']['numFound']
     endNum = min( numFound, ITEMS_PER_PAGE * (page + 1) )
     ctx['searchString'] = searchString
@@ -99,13 +111,8 @@ def search(req):
             allOtherLimits = ",,".join( [x for x in limits if x != limitOn] )
             _removeOptions.append( { 'label' : limitOn.replace('"', ''), 'new_limit' : allOtherLimits} )
         ctx['removeLimits'] = _removeOptions
-    # render using appropriate format
-    if format and format == "py": 
-        resp = HttpResponse( pprint.pformat(ctx) )
-        resp.headers['Content-Type'] = "text/plain" ; return resp
-    else:
-        ctx['response_time'] = "%.4f" % ( time.time() - start )
-        return render_to_response("search.html", ctx )
+    return ctx
+
 def doPagination( page, totalFound, numPerPage ):
     ret = []
     startNum = (page * numPerPage) + 1

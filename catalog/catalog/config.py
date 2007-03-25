@@ -4,22 +4,22 @@ ITEMS_PER_PAGE = 10
 MAX_FACET_TERMS_BASIC = 4    # how many facet terms display by default
 MAX_FACET_TERMS_EXPANDED = 25 # how many facet terms display when you hit "show more"
 OPAC_FULL_BIB_URL = "http://sirsiweb.laurentian.ca/uhtbin/cgisirsi/x/x/x/57/5/?user_id=WEBSERVER&searchdata1=%(bib_num)s{001}"
-FACETS = [    { 'name' : 'Subject: Topic', 'code' : 'topic' },    
-              { 'name' : 'Subject: Genre', 'code' : 'genre' },                            
-              { 'name' : 'Format', 'code' : 'format' },                        
-              { 'name' : 'Library' , 'code' : 'location', 
+FACETS = [    { 'name' : _('Subject: Topic'), 'code' : 'topic' },    
+              { 'name' : _('Subject: Genre'), 'code' : 'genre' },                            
+              { 'name' : _('Format'), 'code' : 'format' },                        
+              { 'name' : _('Library') , 'code' : 'location', 
                'maxItems' : 0 , 'translateFunction' : 'getLocationName'}, 
-              { 'name' : 'Subject: Region', 'code' : 'place' },    
-              { 'name' : 'Language', 'code' : 'language' }, 
-              { 'name' : 'Author', 'code' : 'author_exact'  },]
+              { 'name' : _('Subject: Region'), 'code' : 'place' },    
+              { 'name' : _('Language'), 'code' : 'language' }, 
+              { 'name' : _('Author'), 'code' : 'author_exact'  },]
 
-SEARCH_INDEXES = [ {'name' : 'Anywhere', 'index': 'text'},
-                  {'name' : 'Author', 'index': 'author'} , { 'name' : 'Title', 'index' : 'title' },
-                   {'name' : 'Subject', 'index': 'subject'}, { 'name' : 'ISBN', 'index' : 'isbn' },]
+SEARCH_INDEXES = [ {'name' : _('Anywhere'), 'index': 'text'},
+                  {'name' : _('Author'), 'index': 'author'} , { 'name' : _('Title'), 'index' : 'title' },
+                  {'name' : _('Subject'), 'index': 'subject'}, { 'name' : _('ISBN'), 'index' : 'isbn' },]
 
-SORTS = [{ 'name' : 'Pub. Date (newest first)', 'direction' : 'desc', 'field' : 'pubdate' },
-         { 'name' : 'Pub. Date (oldest first)', 'direction' : 'asc', 'field' : 'pubdate' },
-         { 'name' : 'Author A-Z', 'direction' : 'asc', 'field' : 'author_exact' },]
+SORTS = [{ 'name' : _('Pub. Date (newest first)'), 'direction' : 'desc', 'field' : 'pubdate' },
+         { 'name' : _('Pub. Date (oldest first)'), 'direction' : 'asc', 'field' : 'pubdate' },
+         { 'name' : _('Author A-Z'), 'direction' : 'asc', 'field' : 'author_exact' },]
 
 FORMAT_ICONS = { 'eAudio' : '<img src="http://catalog.spl.org/hipres/images/formaticons/ipac-icon-eaudio.gif" alt="eAudio" />',
                     'eBook' : '<img src="http://catalog.spl.org/hipres/images/formaticons/ipac-icon-ebook.gif" alt="eBook" />',

@@ -1,0 +1,131 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-03-25 09:25-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: catalog/config.py:7
+msgid "Subject: Topic"
+msgstr "Sujet : Matière"
+
+#: catalog/config.py:8
+msgid "Subject: Genre"
+msgstr "Sujet : Genre"
+
+#: catalog/config.py:9
+msgid "Format"
+msgstr "Type"
+
+#: catalog/config.py:10
+msgid "Library"
+msgstr "Bibliothèque"
+
+#: catalog/config.py:12
+msgid "Subject: Region"
+msgstr "Sujet : Région"
+
+#: catalog/config.py:13
+msgid "Language"
+msgstr "Langue"
+
+#: catalog/config.py:14 catalog/config.py:17
+msgid "Author"
+msgstr "Auteur"
+
+#: catalog/config.py:16
+msgid "Anywhere"
+msgstr "Mots-clés"
+
+#: catalog/config.py:17
+msgid "Title"
+msgstr "Titre"
+
+#: catalog/config.py:18
+msgid "Subject"
+msgstr "Sujet"
+
+#: catalog/config.py:18
+msgid "ISBN"
+msgstr ""
+
+#: catalog/config.py:20
+msgid "Pub. Date (newest first)"
+msgstr "Date pub. (order croissant)"
+
+#: catalog/config.py:21
+msgid "Pub. Date (oldest first)"
+msgstr "Date pub. (order décroissant)"
+
+#: catalog/config.py:22
+msgid "Author A-Z"
+msgstr "Auteur A-Z"
+
+#: catalog/templates/index.html:3
+msgid "Laurentian University Libraries"
+msgstr "Bibliothèques de l'Université Laurentienne"
+
+#: catalog/templates/index.html:48 catalog/templates/search.html:14
+msgid "Search"
+msgstr "Recherche"
+
+#: catalog/templates/search.html:3
+#, python-format
+msgid "Laurentian University Library: Search on %(q)s"
+msgstr "Bibliothèques de l'Université Laurentienne : Recherche %(q)s"
+
+#: catalog/templates/search.html:21
+#, fuzzy, python-format
+msgid ""
+"Results <strong>%(startNum)s-%(endNum)s</strong> of&nbsp;&nbsp;<strong>%"
+"(numFound)s</strong> for %(q)s (%(response_time)s seconds)"
+msgstr ""
+"Resultats <strong>%(startNum)s-%(endNum)s</strong> de&nbsp;&nbsp;<strong>%"
+"(numFound)s</strong> pour %(q)s (%(response_time)s secondes)"
+
+#: catalog/templates/search.html:24
+msgid "Sort by:"
+msgstr "Tri : "
+
+#: catalog/templates/search.html:26
+msgid "Relevance"
+msgstr "Pertinence"
+
+#: catalog/templates/search.html:38
+msgid "Expand Results:"
+msgstr "Augmenter les resultats :"
+
+#: catalog/templates/search.html:50
+msgid "Narrow Results:"
+msgstr "Limiter les resultats :"
+
+#: catalog/templates/search.html:72
+msgid "Show More..."
+msgstr "Montrer plus..."
+
+#: catalog/templates/search.html:83 catalog/templates/search.html.py:134
+msgid "Previous"
+msgstr "Précédent"
+
+#: catalog/templates/search.html:86 catalog/templates/search.html.py:144
+msgid "Next"
+msgstr "Suivant"
+
+#: catalog/templates/search.html:111 catalog/templates/search.html.py:114
+msgid "Call number: "
+msgstr "Cote : "
+
+#: catalog/templates/search.html:120
+msgid "Online resource"
+msgstr "Enligne"

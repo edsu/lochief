@@ -1,5 +1,6 @@
+{% load i18n %}
 {% extends "index.html" %}
-{% block title %}Laurentian University Library: Search on {{q}}{% endblock %}
+{% block title %}{% blocktrans %}Laurentian University Library: Search on {{q}}{% endblocktrans %}{% endblock %}
 {% block body %}
 		<div class="searchform">
 		<form name="s" method="GET" action = "/catalog/search">
@@ -10,19 +11,19 @@
 					<option value="{{indexOn.index}}" {% ifequal indexOn.index currentIndex%}selected="true"{% endifequal %}>{{indexOn.name}}</option>
 				{% endfor %}
 			</select>
-			<input type="submit" value="Search" class="searchbutton" />		
+			<input type="submit" value={%trans "Search" %} class="searchbutton" />		
 		</form>
 		</div>
 <div class="topbar">
 	<table width="100%">
 		<tr>
 			<td>
-				Results <strong>{{startNum}}-{{endNum}}</strong> of&nbsp;&nbsp;<strong>{{response.numFound}}</strong> for {{q}} ({{response_time}} seconds)	
+				{% blocktrans with response.numFound as numFound %}Results <strong>{{startNum}}-{{endNum}}</strong> of&nbsp;&nbsp;<strong>{{numFound}}</strong> for {{q}} ({{response_time}} seconds){% endblocktrans %}
 			</td>
 			<td align="right" valign="center">
-				<form name="sortForm"><strong>Sort by:</strong>
+				<form name="sortForm"><strong>{% trans "Sort by:" %}</strong>
 					<select name="sortField" onchange="doSort()">
-						<option value="?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}">Relevance</option>
+						<option value="?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}">{% trans "Relevance" %}</option>
 						{% for sortOn in sorts %}
 							<option {% if sortOn.selected %}selected="true"{% endif %} value='?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{sortOn.field}}%20{{sortOn.direction}}'>{{sortOn.name}}</option>
 						{% endfor %}
@@ -34,7 +35,7 @@
 </div>
 <div class="facets">
 	{% if removeLimits %}
-		<strong>Expand Results:</strong><br />
+		<strong>{% trans "Expand Results:" %}</strong><br />
 			<div class="remove-facet-list">
 				<ul> 
 				{% for limitOn in removeLimits %}
@@ -46,7 +47,7 @@
 			</div>
 		<br />
 	{% endif %} 
-	<strong>Narrow Results:</strong><br /><br />
+	<strong>{% trans "Narrow Results:" %}</strong><br /><br />
 	{% for facetOn in facets %}
 		{% if facetOn.terms %}
 			<div class="facet-list" id="facet-list-{{facetOn.code}}">
@@ -68,7 +69,7 @@
 					{% endif %}
 					</ul>
 				{% if facetOn.has_more %}
-					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">Show More...</a>
+					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">{% trans "Show More..." %}</a>
 					
 				{% endif %}
 			</div>
@@ -79,10 +80,10 @@
 	{% comment %}{% if pagination.hasPrevious or pagination.hasNext %}
 	<div class="prev-next-top">
 		{% if pagination.hasPrevious %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;{% trans "Previous" %}</a></span>
 		{% endif %}		
 		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>Next&nbsp;&raquo;</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>{% trans "Next" %}&nbsp;&raquo;</a></span>
 		{% endif %}	
 	</div>
 	{% endif %}
@@ -98,7 +99,7 @@
 		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
 		<div class="author">
 			{% if docOn.author %}
-				by {% for authorOn in docOn.author %}<a href='/catalog/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %},{% endif %}{% endfor %}
+				by {% for authorOn in docOn.author %}<a href='/catalog/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
 			{% endif %}
 		</div>
 		<div class="publisher">
@@ -107,16 +108,16 @@
 		</div>
 		<div class="callnum">
 			{%if docOn.LCClass %}
-				{%for LCNum in docOn.LCClass %}Call number: {{LCNum}}{% if not forloop.last %},{% endif %}{% endfor %}
+				{%for LCNum in docOn.LCClass %}{% trans "Call number: " %}{{LCNum}}{% if not forloop.last %},{% endif %}{% endfor %}
 			{% endif %}
 			{%if docOn.DeweyClass %}
-				{%for DeweyNum in docOn.DeweyClass %}Call number: {{DeweyNum}}{% if not forloop.last %},{% endif %}{% endfor %}
+				{%for DeweyNum in docOn.DeweyClass %}{% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %},{% endif %}{% endfor %}
 			{% endif %}
 		</div>
 		{% if docOn.url %}
 			{%for url in docOn.url %}
 		<div class="url">
-			<a href="{{url}}">Online resource</a>
+			<a href="{{url}}">{% trans "Online resource" %}</a>
 		</div>
 			{% endfor %}
 		{% endif %}
@@ -130,7 +131,7 @@
 <br clear="all" />
 <div class="pagination">
 		{% if pagination.hasPrevious %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;{% trans "Previous" %}</a></span>
 		{% endif %}	
 		{% for pageOn in pagination.pages %}
 			{% if pageOn.selected %}
@@ -140,7 +141,7 @@
 			{% endif %}
 		{% endfor %}
 		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>Next&nbsp;&raquo;</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>{% trans "Next" %}&nbsp;&raquo;</a></span>
 		{% endif %}	
 </div>
 {% endif %}

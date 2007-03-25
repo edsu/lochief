@@ -13,25 +13,25 @@ DATABASE_PORT = ''
 
 TIME_ZONE = "PST8PDT"
 
-CACHE_BACKEND = 'locmem:///'
+CACHE_BACKEND = 'simple:///'
 
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1 
-MEDIA_URL = 'http://localhost:8008/site_media'
+MEDIA_URL = ''
 ADMIN_MEDIA_PREFIX = '/media/'
 
-SECRET_KEY = 'g&4kmzrz@5#o&zi13490jmklsrklqiwer5mlze(j*9cxoia6j-2aji!'
+# You should set this to something long and cryptic
+SECRET_KEY = ''
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
-   #  'django.template.loaders.eggs.load_template_source',
 )
 
 MIDDLEWARE_CLASSES = (
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.doc.XViewMiddleware",
 )
@@ -39,7 +39,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
-#     "c:/projects/helios/savitr/templates",
  )
 
-INSTALLED_APPS = ( 'catalog', )
+INSTALLED_APPS = ('catalog')
