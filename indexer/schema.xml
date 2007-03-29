@@ -170,8 +170,8 @@
 
    
 <!-- begin added csd 9.12.2006 -->
-	<field name="bib_num" type="text" indexed="true" stored="true" /> <!-- sint == sortable int -->
-	<!--<field name="bib_num" type="sint" indexed="true" stored="true" /> --> <!-- sint == sortable int --> 
+	<field name="bib_num" type="string" indexed="true" stored="true" />
+
 	<field name="title" type="text" indexed="true" stored="true" />
     
 	<field name="author" type="text" indexed="true" stored="true" multiValued="true" />
