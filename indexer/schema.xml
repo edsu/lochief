@@ -172,6 +172,8 @@
 <!-- begin added csd 9.12.2006 -->
 	<field name="bib_num" type="string" indexed="true" stored="true" />
 
+	<field name="ctrl_num" type="string" indexed="true" stored="true" />
+
 	<field name="title" type="text" indexed="true" stored="true" />
     
 	<field name="author" type="text" indexed="true" stored="true" multiValued="true" />
@@ -213,6 +215,7 @@
 
 	<!-- begin item info (from 935 or elsewhere) -->
 	<field name="location" type="string" indexed="true" stored="true" multiValued="true" />
+	<field name="status" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="collection" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="deweyClass" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="LCClass" type="string" indexed="true" stored="true" multiValued="true" />

@@ -1,12 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.core.cache import cache
+from django.views.decorators.vary import vary_on_headers
 from config import *
-import urllib, pprint, time
+import urllib, pprint, time, re
 
 facetCodes = [ f['code'] for f in FACETS ]
 allFacets = FACETS
 
+@vary_on_headers('accept-language', 'accept-encoding')
 def index(req):
     return render_to_response("index.html", {} )
 
@@ -18,6 +20,7 @@ def makeSearchString(q, index, limits, sort):
         ret = """%s ; %s""" % (ret, sort) 
     return urllib.quote( ret )     # the quote() function is crucial to allow Unicode to work in URLs
 
+@vary_on_headers('accept-language', 'accept-encoding')
 def search(req):
     start = time.time()
     ctx = getResults(req)
@@ -69,11 +72,27 @@ def getResults(req):
     # augment item results.
     count = 0
     for itemOn in ctx['response']['docs']:
-        itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % itemOn
         itemOn['count'] = count + startNum
         count += 1
+        # Every item that we export, by definition, has a bib_num... but the
+        # field might not be indexed in the proprietary ILS
+
+        # {ckey} is the field to search for the catalog key in Unicorn
+        ckey = re.compile('\s(.*)$')
+        bib_num = ckey.search(itemOn['bib_num']).group(1)
+        itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (bib_num, "ckey")
+
+        # Another ILS may have to use a different field, such as the ones below
+        # Uncomment the one(s) that works for your ILS
         if itemOn.has_key('isbn'):
             itemOn['isbn_numeric'] = ''.join( [ x for x in itemOn['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
+            # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['isbn_numeric'], "020")
+        # 001 field is our best match option
+        if itemOn.has_key('ctrl_num'):
+            # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['ctrl_num'], "001")
+            pass
+
+        # Add the media format icons
         if itemOn.has_key('format'):
             formatIconURL = FORMAT_ICONS.get( itemOn['format'], None)
             if formatIconURL: itemOn['format_icon_url'] = formatIconURL

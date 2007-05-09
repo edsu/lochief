@@ -120,7 +120,7 @@ def formatProcessor( record, marcMap=None, extractor=None):
             elif leader[7] == "s":            # serial
                 if len(fixedLengthData) > 18:
                     if fixedLengthData[18] in serialsFrequencies:
-                        theFormat = "Magazine"
+                        theFormat = "Journal"
                     else:
                         # this is here to prevent stuff that librarians and nobody else
                         # would consider to be a serial from being labeled as a magazine.
