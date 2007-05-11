@@ -21,6 +21,7 @@ RECORDS_TO_SKIP = indexerConfig.get("RECORDS_TO_SKIP")
 SOLR_INDEX_BATCH_SIZE = indexerConfig.get("SOLR_INDEX_BATCH_SIZE")
 SOLR_COMMIT_BATCH_SIZE = indexerConfig.get("SOLR_COMMIT_BATCH_SIZE")
 PRINT_SOLR_POST_DATA = indexerConfig.get("PRINT_SOLR_POST_DATA")
+PRINT_SOLR_RESP_DATA = indexerConfig.get("PRINT_SOLR_RESP_DATA")
 PROFILE = indexerConfig.get("PROFILE") 
 DO_ACCESSION = indexerConfig.get("DO_ACCESSION") ## currently not used!
 
@@ -125,6 +126,8 @@ def processFile( filename, anselUnicodeConverter = None ):
                 print "committing..."
                 beginCommitTime = time.time()
                 resp = postURL( SOLR_UPDATE_URL, SOLR_COMMIT_MESSAGE)
+                if PRINT_SOLR_RESP_DATA:
+                    print resp
                 commitTime += ( time.time() - beginCommitTime )
             except IOError:
                 import time
@@ -145,6 +148,8 @@ def processFile( filename, anselUnicodeConverter = None ):
     if len(data) > 0:
         print "doing final POST"
         resp = postURL( SOLR_UPDATE_URL, "<add>%s</add>" % data)
+        if PRINT_SOLR_RESP_DATA:
+            print resp
     print "committing..."
     commit()
           

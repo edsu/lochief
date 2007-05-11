@@ -1,0 +1,1 @@
+java -classpath ".;jython.jar;marc4j.jar" -Xmx256M org.python.util.jython indexerDriverSS.py %1

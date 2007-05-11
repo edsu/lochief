@@ -1,10 +1,10 @@
 {% load i18n %}
 {% extends "index.html" %}
-{% block title %}{% blocktrans %}Laurentian University Library: Search on {{q}}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans %}{{LOCAL_INSTITUTION_NAME}} Search on {{q}}{% endblocktrans %}{% endblock %}
 {% block body %}
 		<div class="searchform">
 		<form name="s" method="GET" action = "/catalog/search">
-			<span class="logo"><a href="/catalog/"><img src="http://www.laurentian.ca/Laurentian.WCMSPortal/Inc/images/logo_laurentian.jpg" /></a></span> 
+			<span class="logo"><a href="/catalog/"><img src={{LOCAL_LOGO_LOCATION}} /></a></span> 
 			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
 			<select name="index" id="id_index"> 
 				{% for indexOn in indexes %}
@@ -90,13 +90,14 @@
 	{% endcomment %}
 {% for docOn in response.docs %}
 <table class="record">
+
 	<tr>
 	<td>{{docOn.count}}.</td>
 	<td width="10%">
 		    {% if docOn.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{docOn.isbn_numeric}}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
 	</td>
-	<td align="left" width="80%"> 
-		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
+	<td align="left" width="80%">
+		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>	
 		<div class="author">
 			{% if docOn.author %}
 				{%trans "by" %} {% for authorOn in docOn.author %}<a href='/catalog/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %}; {% endif %}{% endfor %}
@@ -121,9 +122,27 @@
 		</div>
 			{% endfor %}
 		{% endif %}
+		
+		{% if docOn.SSurldetails %}
+		<div class="Journallinks">
+		<ul>
+			{% for SSurls in docOn.SSurldetails %}
+			
+				<li><font color="#FF0000">Find it here -></font><a href='{% for tmp in SSurls %}{% ifequal forloop.counter0 0 %}{{tmp}}'>{% endifequal %}{% ifequal forloop.counter0 1 %}{{tmp}}</a>{% endifequal %}{% ifequal forloop.counter0 2 %} from {{tmp}}{% endifequal %}{% ifequal forloop.counter0 3 %} to {{tmp}}{% endifequal %}{% endfor %}</li>
+			{% endfor %}
+		</ul>
+		</div>
+		{% endif %}		
+		
+	</td>
+	<td align="right">
+		{% ifequal docOn.availability 'Available' %}<font color="#009900">{{docOn.availability}}</font>{% endifequal %}
+		{% ifequal docOn.availability 'Unavailable' %}<font color="#FF0000">{{docOn.availability}}</font>{% endifequal %}
+	
 	</td>
 	<td align="right">{{ docOn.format_icon_url }}</td>
 	</tr>
+	
 </table>
 {% endfor %}
 </div>

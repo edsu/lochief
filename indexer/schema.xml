@@ -175,7 +175,7 @@
 	<field name="ctrl_num" type="string" indexed="true" stored="true" />
 
 	<field name="title" type="text" indexed="true" stored="true" />
-    
+    	
 	<field name="author" type="text" indexed="true" stored="true" multiValued="true" />
 	<field name="performer" type="text" indexed="true" stored="true" multiValued="true" />
 	<!--<field name="subject" type="text" indexed="true" stored="true" multiValued="true" />-->
@@ -199,19 +199,16 @@
 	<field name="format" type="string" indexed="true" stored="true" />
 
 	<field name="pubdate" type="string" indexed="true" stored="true" />
-
 	<field name="publisher" type="text" indexed="true" stored="true" />
 
     <field name="series" type="text" indexed="true" stored="true" />
     
-	<field name="isbn" type="string" indexed="true" stored="true" />
-	
+	<field name="isbn" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="notes" type="text" indexed="true" stored="true" multiValued="true" />
 	
 	<field name="url" type="string" indexed="true" stored="true" multiValued="true" />
 	
 	<field name="contents" type="text" indexed="true" stored="true" multiValued="true" />
-
 
 	<!-- begin item info (from 935 or elsewhere) -->
 	<field name="location" type="string" indexed="true" stored="true" multiValued="true" />
@@ -241,6 +238,16 @@
    <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="subject" type="text" indexed="true" stored="true" multiValued="true" />
 
+	<!-- added 5-10-07 -->
+	<field name="callnum" type="string" indexed="false" stored="true" />
+	<field name="barcode" type="string" indexed="true" stored="true" multiValued="true" />
+	<field name="issn" type="string" indexed="true" stored="true" />
+	<field name="pubdaterange" type="string" indexed="true" stored="true" />
+	<field name="SSdata" type="string" indexed="false" stored="true" multiValued="true" />
+	<field name="availability" type="string" indexed="true" stored="true" multiValued="false" />
+	<field name="copyinfo" type="text_ws" indexed="true" stored="true" multiValued="true" />
+
+
  </fields>
 
  <!-- field to use to determine and enforce document uniqueness. -->
@@ -252,7 +259,7 @@
  <!-- SolrQueryParser configuration:
         defaultOperator="AND|OR"
  -->
- <solrQueryParser defaultOperator="OR"/>
+ <solrQueryParser defaultOperator="AND"/>
 
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field different
@@ -296,13 +303,15 @@
    <copyField source="pubdate" dest="pubdate_exact" /> -->
    
    <copyField source="isbn" dest="text" />
-   
    <copyField source="notes" dest="text" />
    <copyField source="contents" dest="text" />
    
    <copyField source="url" dest="text" />
 
 
+	<!-- added 5-10-07 -->
+	<copyField source="issn" dest="text" />
+	<!-- end added 5-10-07 -->
 
  <!-- Similarity is the scoring routine for each document vs a query.
       A custom similarity may be specified here, but the default is fine

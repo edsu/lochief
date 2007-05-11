@@ -53,6 +53,30 @@ def pubdateProcessor( record, marcMap=None, extractor=None):
         print "could not parse pubdate from <<%s>>" % pubdate
     return ret
 
+def pubdaterangeProcessor( record, marcMap=None, extractor=None):
+    import re
+    pubdate = extractor.extract(marcMap)
+    ret = None
+    if type(pubdate) == type([]):
+        if (len(pubdate) > 0):
+            pubdate = pubdate[0]    # TODO: make it handle multiple pubdates, or pick the 'best' one or something
+        else:
+            return None    # empty list
+    pubdateYearRegexes = [  r"""\[(\d{4})\]""", r"""[cp]{1}(\d{4})""", r"""([\d]{4})""",]
+
+    for regexOn in pubdateYearRegexes:
+        resultOn = re.findall( regexOn, pubdate )
+        if len(resultOn) >= 1:
+            # TODO: decide if there are > 1 viable results, if we should just take the 1st one like this...
+            count = 0
+            dateranges = range(0,2050,10)
+            for i in dateranges:
+                if int(resultOn[0]) >= dateranges[count] and int(resultOn[0]) < dateranges[count + 1]:
+                    return "%s-%s" % (dateranges[count],(dateranges[count + 1]-1))
+                count += 1
+    if ret is None:
+        print "Xcould not parse pubdate from <<%s>>" % pubdate
+    return ret
 
 def formatProcessor( record, marcMap=None, extractor=None):
     serialsFrequencies = [ 'b', 'c', 'd','e','f','i','j','m','q','s','t','w']
@@ -167,3 +191,99 @@ def formatProcessor( record, marcMap=None, extractor=None):
             elif( callNum.startswith("emusic") ):
                 theFormat = "Digital Music"
     return theFormat
+
+def formatbylocProcessor( record, marcMap=None, extractor=None):
+    serialsFrequencies = [ 'b', 'c', 'd','e','f','i','j','m','q','s','t','w']
+    marcRecord = record
+    leader = marcRecord.get('000', None)
+    if leader is None:
+        return "Unknown"
+    physDescr = marcRecord.get('007', [" ",] )[0]
+    theFormat = "Unknown"
+
+    #Determine Item type from 999 field.Format Icons settings found in catalog/config.py
+    itemType = marcRecord.get('999', None)
+    count = 0
+    for copies in itemType:
+        count = count + 1
+        for key, value in copies.items():
+            if key == "t":
+                if value == "BOOK":
+                    theFormat = "Book"
+                elif value == "AV":
+                    theFormat = "Audio-Visual"
+                elif value == "JOURNAL":
+                    theFormat = "Journal"
+                elif value == "LAPTOP":
+                    theFormat == "Laptop"
+                elif value == "EQUIP":
+                    theFormat == "Equipment"
+                elif value == "LOCAL_HIST":
+                    theFormat == "Local_History"
+                elif value == "REF_BOOK":
+                    theFormat == "Reference"
+                elif value == "RESERVE":
+                    theFormat == "Reserve"
+                elif value == "SOFTWARE":
+                    theFormat == "Software"
+                elif value == "VIDEO":
+                    theFormat == "Video"
+                elif value == "MAP":
+                    theFormat == "Map"
+                else:
+                    theFormat == "Unknown"
+
+        
+    return theFormat
+
+def CopyinfoProcessor( record, marcMap=None, extractor=None):
+    copyinfoOn = None
+    
+    if record.has_key('999'):
+        copyinfoOn = []
+        tmpli=[]
+        status = ''
+        for recordOn in record['999']:
+            
+            #set availability status
+            #%k = location if unavailable
+            if not recordOn.has_key('k') and recordOn['l']!="DISCARD":
+                status = "Available"
+            else:
+                status = "Unavailable"
+       
+            #%c= copy #    %l=location
+            if recordOn.has_key('c') and recordOn.has_key('l'):
+                if recordOn.has_key('k'):
+                    copyinfoOn.append('%s|%s|%s|%s|%s' % (recordOn['c'], recordOn['a'], recordOn['k'], recordOn['t'], status))
+                else:
+                    copyinfoOn.append('%s|%s|%s|%s|%s' % (recordOn['c'],recordOn['a'], recordOn['l'], recordOn['t'], status))
+                           
+    return copyinfoOn
+
+
+def AvailabilityProcessor( record, marcMap=None, extractor=None):
+    availabilityOn = None
+    status = None
+    if record.has_key('999'):
+        availabilityOn = []
+        #unavailableflag = false
+        availableflag = 0
+        for recordOn in record['999']:
+            
+            #set availability status
+            #%k = location if unavailable
+         #   if recordOn.has_key('k'):
+          #      unavailableflag = true
+            if not recordOn.has_key('k') and recordOn['l']!="DISCARD":
+                availableflag = 1
+
+        if availableflag == 1:
+            status = 'Available'
+            
+        if availableflag == 0:
+            status = 'Unavailable'
+           
+        availabilityOn = ['%s' % status]
+                           
+    return availabilityOn
