@@ -1,29 +1,20 @@
-
+{% load i18n %}
 {% extends "index.html" %}
-{% block title %}Paul Smith's College Library Catalog: Search on {{q}}{% endblock %}
+{% block title %}{% blocktrans %}{{LOCAL_INSTITUTION_NAME}} Search on {{q}}{% endblocktrans %}{% endblock %}
 {% block body %}
 		<div class="searchform">
 		<form name="s" method="GET" action = "/catalog/search">
-			<span class="logo"><a href="/catalog/"><img src="http://localhost/media/PSClogo.jpg" /></a></span> 
+			<span class="logo"><a href="/catalog/"><img src={{LOCAL_LOGO_LOCATION}} /></a></span> 
 			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
 			<select name="index" id="id_index"> 
 				{% for indexOn in indexes %}
 					<option value="{{indexOn.index}}" {% ifequal indexOn.index 'text'%}selected="true"{% endifequal %}>{{indexOn.name}}</option>
 				{% endfor %}
 			</select>
-			<input type="submit" value="Search" class="searchbutton" />		
+			<input type="submit" value={%trans "Search" %} class="searchbutton" />		
 		</form>
 		</div>
-<div class="topbar">
-	<table width="100%">
-		<tr>
-			<td align="left">
-				Results <strong>{{startNum}}-{{endNum}}</strong> of&nbsp;&nbsp;<strong>{{response.numFound}}</strong> for {{q}} ({{response_time}} seconds)	
-			</td>
-			
-		</tr>
-	</table>	
-</div>
+
 
 <div class="results">
 	{% comment %}{% if pagination.hasPrevious or pagination.hasNext %}
@@ -32,7 +23,7 @@
 			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
 		{% endif %}		
 		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>Next&nbsp;&raquo;</a></span>
+			<span class="page-num"><a href='/catalog/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>{% trans "Next" %}&nbsp;&raquo;</a></span>
 		{% endif %}	
 	</div>
 	{% endif %}
@@ -40,7 +31,7 @@
 {% for docOn in response.docs %}
 <table class="record">
 	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>Author:</strong></td>
+		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Author: " %}</strong></td>
 		<td valign=top class="text" >
 			<div class="author">
 			{% if docOn.author %}
@@ -50,7 +41,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>Title:</strong></td>
+		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Title:" %}</strong></td>
 		<td valign=top class="text" >
 			<div class="title">
 			{{docOn.title}}
@@ -58,7 +49,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>Publisher:</strong></td>
+		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Publisher:" %}</strong></td>
 		<td valign=top class="text" >
 			<div class="publisher">
 			{{docOn.publisher}} {%if docOn.pubdate %}{{docOn.pubdate}}</a> {% endif %}
@@ -68,7 +59,7 @@
 	
 	{% if docOn.isbn_numeric %}
 	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>ISBN:</strong></td>
+		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{%trans "ISBN:" %}</strong></td>
 		<td valign=top class="text" >
 			<div class="isbn">
 			{% if docOn.isbn_numeric %}{{docOn.isbn_numeric}}{% endif %}
@@ -79,7 +70,7 @@
 	
 	{% if docOn.issn %}
 	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>ISSN:</strong></td>
+		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "ISSN:" %}</strong></td>
 		<td valign=top class="text" >
 			<div class="isbn">
 			{% if docOn.issn %}{{docOn.issn}}{% endif %}
@@ -92,10 +83,10 @@
 		{% for topicTerms in docOn.subject %}
 			
 				<tr>
-					<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>Subject:</strong></td>
+					<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Subject:" %}</strong></td>
 					<td valign=top class="text" >
 						<div class="topic">
-							<a href='/catalog/search/?q="{{topicTerms}}"&index=subject'>{{topicTerms}}</a>, 
+							<a href='/catalog/search/?q="{{topicTerms}}"&index=subject'>{{topicTerms}}</a> 
 						</div>
 					</td>
 				</tr>
@@ -107,11 +98,11 @@
 		
 		<table border="1" cellspacing="0">
 			<tr bgcolor="#FFFFCC">
-				<td width="20">Copy</td>
-				<td width="100">Call Number</td>
-				<td width="220">Location</td>
-				<td width="60">Material</td>
-				<td width="100">Status</td>
+				<td width="20">{% trans "Copy" %}</td>
+				<td width="100">{% trans "Call Number" %}</td>
+				<td width="220">{% trans "Location" %}</td>
+				<td width="60">{% trans "Material" %}</td>
+				<td width="100">{% trans "Status" %}</td>
 			</tr>
 			{% for copies in docOn.copydetails %}
 			<tr>
@@ -136,9 +127,9 @@
 		
 		<table border="1" cellspacing="0">
 			<tr bgcolor="#FFFFCC">
-				<td width="300">Database</td>
-				<td width="60">Available from</td>
-				<td width="100">Available to</td>
+				<td width="300">{% trans "Database" %}</td>
+				<td width="60">{% trans "Available from" %}</td>
+				<td width="100">{% trans "Available to" %}</td>
 			</tr>
 			{% for SSurls in docOn.SSurldetails %}
 			<tr>

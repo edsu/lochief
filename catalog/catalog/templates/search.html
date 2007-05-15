@@ -128,7 +128,7 @@
 		<ul>
 			{% for SSurls in docOn.SSurldetails %}
 			
-				<li><font color="#FF0000">Find it here -></font><a href='{% for tmp in SSurls %}{% ifequal forloop.counter0 0 %}{{tmp}}'>{% endifequal %}{% ifequal forloop.counter0 1 %}{{tmp}}</a>{% endifequal %}{% ifequal forloop.counter0 2 %} from {{tmp}}{% endifequal %}{% ifequal forloop.counter0 3 %} to {{tmp}}{% endifequal %}{% endfor %}</li>
+				<li><font color="#FF0000">{%trans "Find it here" %} -></font><a href='{% for tmp in SSurls %}{% ifequal forloop.counter0 0 %}{{tmp}}'>{% endifequal %}{% ifequal forloop.counter0 1 %}{{tmp}}</a>{% endifequal %}{% ifequal forloop.counter0 2 %} from {{tmp}}{% endifequal %}{% ifequal forloop.counter0 3 %} to {{tmp}}{% endifequal %}{% endfor %}</li>
 			{% endfor %}
 		</ul>
 		</div>
