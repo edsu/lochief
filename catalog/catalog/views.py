@@ -78,6 +78,7 @@ def getsearchresults(req):
         # end sort facets by name
         facetURLTerm = '&facet.field='.join(facetCodes)   
         urlToGet = "http://%s/solr/select?q=%s&wt=python&facet.field=%s%s&facet.zeros=false&facet=true&facet.limit=%s&start=%s" % ( SOLR_SERVER, searchString, facetURLTerm, facetsortTerm, MAX_FACET_TERMS_EXPANDED, startNumZeroIndex )
+        
         data = urllib.urlopen( urlToGet ).read()
         cache.set( cacheKey, data, SEARCH_CACHE_TIME )
     ctx = eval(data)    
@@ -146,10 +147,11 @@ def getsearchresults(req):
                 reverseterms = []
                 for i in range(len(terms)):
                     tempdict[terms[i]] = counts[i]
-                    reverseterms=reversesortDictValues(tempdict)
+                reverseterms=reversesortDictValues(tempdict)
                 if reverseterms:
                     for i in range(len(reverseterms)):
-                        _facetOnTerms.append( dict( term=reverseterms[i], count=counts[i]) )
+                        tmp = reverseterms[i]
+                        _facetOnTerms.append( dict( term=reverseterms[i], count=tempdict[tmp]) )
             else:
                 for i in range(len(terms)):
                     _facetOnTerms.append( dict( term=terms[i], count=counts[i]) )
