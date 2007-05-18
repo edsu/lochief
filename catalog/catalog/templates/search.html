@@ -33,6 +33,26 @@
 		</tr>
 	</table>	
 </div>
+
+ 	
+{% for facetOn in facets %}
+	{% ifequal facetOn.facetlocation 'topbar' %}
+	<div class="topbarfacets">
+		{% if facetOn.terms %}
+		<div class="facet-list" id="facet-list-{{facetOn.code}}">
+				<strong>{{facetOn.name}}</strong>
+					<ul>
+					{% for termOn in facetOn.allterms %}
+					<li>&middot;&nbsp;<a href='/catalog/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:&quot;{{termOn.term}}&quot;'>
+					{{termOn.term}}
+					</a> ({{termOn.count}})</li>
+					{% endfor %}
+					</ul>
+		</div>
+		{% endif %}
+	{% endifequal %}
+{% endfor %} 
+</div>
 <div class="facets">
 	{% if removeLimits %}
 		<strong>{% trans "Expand Results:" %}</strong><br />
@@ -49,6 +69,7 @@
 	{% endif %} 
 	<strong>{% trans "Narrow Results:" %}</strong><br /><br />
 	{% for facetOn in facets %}
+		{% ifequal facetOn.facetlocation 'sidebar' %}
 		{% if facetOn.terms %}
 			<div class="facet-list" id="facet-list-{{facetOn.code}}">
 				<strong>{{facetOn.name}}</strong>
@@ -74,6 +95,7 @@
 				{% endif %}
 			</div>
 		{% endif %}
+		{% endifequal %}
 	{% endfor %}
 </div>
 <div class="results">
@@ -114,6 +136,7 @@
 			{%if docOn.DeweyClass %}
 				{%for DeweyNum in docOn.DeweyClass %}{% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %},{% endif %}{% endfor %}
 			{% endif %}
+			{{callnum}}
 		</div>
 		{% if docOn.url %}
 			{%for url in docOn.url %}

@@ -1,6 +1,6 @@
 # this is where your custom processors go.  They must have record as required argument and
 # marcMap and extractor as optional named arguments.  Don't like it?  Go write your own indexer.
-
+from config.codes import *
 def genreProcessor( record, marcMap=None, extractor=None):
     # todo: change to use extractor
     ret = None
@@ -50,7 +50,7 @@ def pubdateProcessor( record, marcMap=None, extractor=None):
             # TODO: decide if there are > 1 viable results, if we should just take the 1st one like this...
             return resultOn[0]
     if ret is None:
-        print "could not parse pubdate from <<%s>>" % pubdate
+        print "could not parse pubdate from <<%s>> for pubdate" % pubdate
     return ret
 
 def pubdaterangeProcessor( record, marcMap=None, extractor=None):
@@ -75,7 +75,7 @@ def pubdaterangeProcessor( record, marcMap=None, extractor=None):
                     return "%s-%s" % (dateranges[count],(dateranges[count + 1]-1))
                 count += 1
     if ret is None:
-        print "Xcould not parse pubdate from <<%s>>" % pubdate
+        print "could not parse pubdate from <<%s>> for pubdaterange" % pubdate
     return ret
 
 def formatProcessor( record, marcMap=None, extractor=None):
@@ -287,3 +287,45 @@ def AvailabilityProcessor( record, marcMap=None, extractor=None):
         availabilityOn = ['%s' % status]
                            
     return availabilityOn
+
+#used to create browse by call num functionality-layer 1 is 1st layer (ex. Dewey 000-100, 100-200, etc.)
+def DeweyCallnumlayer1Processor( record, marcMap=None, extractor=None):
+    #insert dewey processor here
+    
+    callNum = None
+    recrodDeweyNum = None
+    callNum = extractor.extract( marcMap )
+    callNum = str(callNum[0])
+    deweyranges = range(0,900,100)
+    recordDeweyNum = callNum[:3]
+    #find the description for the dewey range
+    if DEWEY_MAP.has_key(str(recordDeweyNum[:1] + '00')):
+        deweydescription = DEWEY_MAP[str(recordDeweyNum[:1] + '00')]
+    
+    #write the dewey range and description to the index
+    try:
+        for i in deweyranges:
+            if int(recordDeweyNum) >= i and int(recordDeweyNum) < i + 100:
+                return "%s-%s - %s" % (i,i+99,deweydescription.replace('&','and'))
+    except:
+        return None
+                
+
+#used to create browse by call num functionality-layer 2 is subset of 1st layer (ex. Dewey 100-110, 110-120, etc.)
+def DeweyCallnumlayer2Processor( record, marcMap=None, extractor=None):
+        #insert dewey processor here
+        callNum = extractor.extract( marcMap )
+        callNum = str(callNum[0])
+        deweyranges = range(0,990,10)
+        recordDeweyNum = callNum[:3]
+        #find the description for the dewey range
+        if DEWEY_MAP.has_key(str(recordDeweyNum[:2] + '0')):
+            deweydescription = DEWEY_MAP[str(recordDeweyNum[:2] + '0')]
+            
+        #write the dewey range and description to the index
+        try:
+            for i in deweyranges:
+                if int(recordDeweyNum) >= i and int(recordDeweyNum) < i + 10:
+                    return "%s-%s - %s" % (i,i+9,deweydescription.replace('&','and'))
+        except:
+            return None

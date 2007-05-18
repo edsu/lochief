@@ -6,23 +6,35 @@ MAX_FACET_TERMS_EXPANDED = 25 # how many facet terms display when you hit "show 
 LOCAL_LOGO_LOCATION = 'http://www.laurentian.ca/Laurentian.WCMSPortal/Inc/images/logo_laurentian.jpg' #image with 177 x 54 pixels
 LOCAL_INSTITUTION_NAME = 'Laurentian University Library:'
 OPAC_FULL_BIB_URL = "http://sirsiweb.laurentian.ca/uhtbin/cgisirsi/x/x/x/57/5/?user_id=WEBSERVER&searchdata1=%s{%s}"
-FACETS = [    { 'name' : _('Subject: Topic'), 'code' : 'topic', 'sortbycount' : 'true' },    
-              { 'name' : _('Subject: Genre'), 'code' : 'genre', 'sortbycount' : 'true' },                            
-              { 'name' : _('Format'), 'code' : 'format', 'sortbycount' : 'true' },                         
-              { 'name' : _('Subject: Region'), 'code' : 'place' , 'sortbycount' : 'true'},    
-              { 'name' : _('Language'), 'code' : 'language', 'sortbycount' : 'true' }, 
-              { 'name' : _('Author'), 'code' : 'author_exact','sortbycount' : 'true'  },
-              { 'name' : _('Publication Date'), 'code' : 'pubdaterange', 'sortbycount' : 'reverse' },
-              { 'name' : _('Availability'), 'code' : 'availability', 'sortbycount' : 'false' },]
 
+#FACETS has several settings.
+#name = Display name on the opac
+#code = solr field name
+#sortbycount = whether you want the facets sorted by count. Values can be true, false, and reverse (for reverse alphabetical order)
+#facetlocation =  can be used to display facets in different areas of the screen, as determined by your template. Was originally made to put dewey/lc callnum ranges on top of screen like NCSU
+FACETS = [    { 'name' : _('Dewey Call Number Range 100s'), 'code' : 'callnumlayerone', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'},
+              { 'name' : _('Dewey Call Number Range 10s'), 'code' : 'callnumlayertwo', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'}, 
+              { 'name' : _('Subject: Topic'), 'code' : 'topic', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },    
+              { 'name' : _('Subject: Genre'), 'code' : 'genre', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'},                            
+              { 'name' : _('Format'), 'code' : 'format', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },                         
+              { 'name' : _('Subject: Region'), 'code' : 'place' , 'sortbycount' : 'true', 'facetlocation' : 'sidebar'},    
+              { 'name' : _('Language'), 'code' : 'language', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'}, 
+              { 'name' : _('Author'), 'code' : 'author_exact','sortbycount' : 'false' , 'facetlocation' : 'sidebar' },
+              { 'name' : _('Publication Date'), 'code' : 'pubdaterange', 'sortbycount' : 'reverse', 'facetlocation' : 'sidebar' },
+              { 'name' : _('Availability'), 'code' : 'availability', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'},
+              ]
+
+#items listed in the search dropdown box
 SEARCH_INDEXES = [ {'name' : _('Anywhere'), 'index': 'text'},
                   {'name' : _('Author'), 'index': 'author'} , { 'name' : _('Title'), 'index' : 'title' },
                   {'name' : _('Subject'), 'index': 'subject'}, { 'name' : _('ISBN'), 'index' : 'isbn' },]
 
+#items to be listed in the "Sort By:" Dropdown box
 SORTS = [{ 'name' : _('Pub. Date (newest first)'), 'direction' : 'desc', 'field' : 'pubdate' },
          { 'name' : _('Pub. Date (oldest first)'), 'direction' : 'asc', 'field' : 'pubdate' },
-         { 'name' : _('Author A-Z'), 'direction' : 'asc', 'field' : 'author_exact' },]
+         { 'name' : _('Author A-Z'), 'direction' : 'desc', 'field' : 'author_exact' },]
 
+#Icons corresponding to item type
 FORMAT_ICONS = { 'eAudio' : '<img src="http://catalog.spl.org/hipres/images/formaticons/ipac-icon-eaudio.gif" alt="eAudio" />',
                     'eBook' : '<img src="http://catalog.spl.org/hipres/images/formaticons/ipac-icon-ebook.gif" alt="eBook" />',
                     'CD-ROM' : '<img src="http://catalog.spl.org/hipres/images/formaticons/ipac-icon-cdrom.gif" alt="cd rom" />',

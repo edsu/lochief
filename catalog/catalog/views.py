@@ -61,10 +61,13 @@ def getsearchresults(req):
     startNumZeroIndex = (ITEMS_PER_PAGE * page )
     startNum = startNumZeroIndex + 1
     limit = req.GET.get('limit', None)
+    browserange = req.GET.get('browserange', None)
     if limit is not None and len(limit.strip()) > 0:
         limits = limit.split(",,")
     else:
         limits = []
+    
+        
     sort = req.GET.get('sort', None)        
     searchString = makeSearchString( q, index, limits, sort)
     cacheKey = "%s~%s" % (searchString, page)
@@ -81,8 +84,10 @@ def getsearchresults(req):
         
         data = urllib.urlopen( urlToGet ).read()
         cache.set( cacheKey, data, SEARCH_CACHE_TIME )
-    ctx = eval(data)    
+    ctx = eval(data) 
     ctx['format'] = format;
+    ctx['limit']=limits
+    ctx['searchstring']=searchString
     print ctx
     numFound = ctx['response']['numFound']
     endNum = min( numFound, ITEMS_PER_PAGE * (page + 1) )
@@ -91,11 +96,15 @@ def getsearchresults(req):
     if limit is not None: ctx['currentLimit'] = limit.replace('"', '%22')
     if sort is not None: ctx['currentSort'] = sort
     if index is not None: ctx['currentIndex'] = index
+    
     # augment item results.
     count = 0
     for itemOn in ctx['response']['docs']:
         itemOn['count'] = count + startNum
         count += 1
+        
+        #call number display
+        
         # Every item that we export, by definition, has a bib_num... but the
         # field might not be indexed in the proprietary ILS
 
@@ -106,8 +115,7 @@ def getsearchresults(req):
 
         # Another ILS may have to use a different field, such as the ones below
         # Uncomment the one(s) that works for your ILS
-        if itemOn.has_key('isbn'):
-            itemOn['isbn_numeric'] = ''.join( [ x for x in itemOn['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
+        
             # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['isbn_numeric'], "020")
         # 001 field is our best match option
         if itemOn.has_key('ctrl_num'):
@@ -134,7 +142,8 @@ def getsearchresults(req):
     # re-majigger facets 
     facetCounts = ctx['facet_counts']
     del ctx['facet_counts']
-    _facets = []
+    _facets = []   
+
     for facetCodeOn in allFacets:
         facetOn = {'terms' : [], 'extended_terms' : [], 'code' : facetCodeOn['code'], 'name' : facetCodeOn['name'], 'has_more' : False }
         if facetCounts['facet_fields'].has_key( facetCodeOn['code'] ):        
@@ -159,8 +168,48 @@ def getsearchresults(req):
                 facetOn['has_more'] = True
                 facetOn['terms'] , facetOn['extended_terms'] = _facetOnTerms[:MAX_FACET_TERMS_BASIC], _facetOnTerms[MAX_FACET_TERMS_BASIC: ]
             else:
-                facetOn['terms'] = _facetOnTerms 
-        _facets.append( facetOn )
+                facetOn['terms'] = _facetOnTerms
+            facetOn['allterms'] = _facetOnTerms
+            facetOn['facetlocation'] = facetCodeOn['facetlocation']
+            _facets.append( facetOn )
+        
+    #find out if callnumlayerone is a limit and remove it from the facets 
+    #dictionary if it is so that only callnumlayer2 is displayed (i.e. if 
+    #100's dewey is limited, display the 10's)
+    callnumlayeronefound = 0
+    callnumlayertwofound = 0
+    if limits:
+        for limitOn in limits:
+            if limitOn[:15] == 'callnumlayerone':
+                callnumlayeronefound = 1
+        for limitOn in limits:
+            if limitOn[:15] == 'callnumlayertwo':
+                callnumlayertwofound = 1
+    #if callnumlayerone was not found to be a limit, remove 
+    #callnumlayertwo so that only callnumlayerone displays 
+    #(ie, show the 100's dewey only instead of 100's and 10's)
+    if callnumlayeronefound == 1 or (callnumlayeronefound == 0 and callnumlayertwofound == 1): 
+        count = 0
+        for f in _facets:
+            if f['code'] == 'callnumlayerone':
+                del _facets[count]
+                break
+            count += 1
+    
+    if callnumlayeronefound == 0 or (callnumlayeronefound == 1 and callnumlayertwofound == 1): 
+        count = 0
+        for f in _facets:
+            if f['code'] == 'callnumlayertwo':
+                del _facets[count]
+                break
+            count += 1
+                        
+    
+    
+            
+                           
+                            
+                    
     ctx['facets']  = _facets
     ctx['indexes'] = SEARCH_INDEXES
     ctx['startNum'] = startNum
