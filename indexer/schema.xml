@@ -240,6 +240,11 @@
 
 	<!-- added 5-10-07 -->
 	<field name="callnum" type="string" indexed="false" stored="true" />
+	
+	<!-- added 5-16 for browsing functionality -->
+	<field name="callnumlayerone" type="string" indexed="true" stored="true" />
+	<field name="callnumlayertwo" type="string" indexed="true" stored="true" />
+	
 	<field name="barcode" type="string" indexed="true" stored="true" multiValued="true" />
 	<field name="issn" type="string" indexed="true" stored="true" />
 	<field name="pubdaterange" type="string" indexed="true" stored="true" />
