@@ -109,7 +109,8 @@ def processFile( filename, anselUnicodeConverter = None ):
         mrserTime = time.time()            
         serializedRecord = rec.serialize()
         marcSerializeTime += ( time.time() - mrserTime )
-        data += serializedRecord
+	if rec.bib_num is not None:
+            data += serializedRecord
             
         if( (count % SOLR_INDEX_BATCH_SIZE ) == 0):
            # nb. neither apache commons nor python urllib works right here!  Unicode gets mangled.  Must use postURL

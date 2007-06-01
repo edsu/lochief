@@ -5,7 +5,14 @@ MAX_FACET_TERMS_BASIC = 4    # how many facet terms display by default
 MAX_FACET_TERMS_EXPANDED = 25 # how many facet terms display when you hit "show more"
 LOCAL_LOGO_LOCATION = 'http://www.laurentian.ca/Laurentian.WCMSPortal/Inc/images/logo_laurentian.jpg' #image with 177 x 54 pixels
 LOCAL_INSTITUTION_NAME = 'Laurentian University Library:'
+# Horizon IPAC example
+#OPAC_FULL_BIB_URL = "http://catalog.spl.org/ipac20/ipac.jsp?index=BIB&term=%(bib_num)s"
+# Unicorn iBistro / iLink example
 OPAC_FULL_BIB_URL = "http://sirsiweb.laurentian.ca/uhtbin/cgisirsi/x/x/x/57/5/?user_id=WEBSERVER&searchdata1=%s{%s}"
+# LOCAL_ITEM_DISPLAY has two settings:
+# 0 : Make item title a link to the detailed view in vendor catalog
+# 1 : Make item title a link to the detailed view in fac-back-opac
+LOCAL_ITEM_DISPLAY = 0
 
 #FACETS has several settings.
 #name = Display name on the opac

@@ -104,31 +104,30 @@ def getsearchresults(req):
         count += 1
         
         #call number display
-        
-        # Every item that we export, by definition, has a bib_num... but the
-        # field might not be indexed in the proprietary ILS
 
-        # {ckey} is the field to search for the catalog key in Unicorn
-        #ckey = re.compile('\s(.*)$')
-        #bib_num = ckey.search(itemOn['bib_num']).group(1)
-        #itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (bib_num, "ckey")
+        if LOCAL_ITEM_DISPLAY == 1:
+             # use the local facbackopac view   
+            if itemOn.has_key('bib_num'):
+                itemOn['full_bib_url'] = '/catalog/item/?q=%s&index=bib_num' % ('%22' + itemOn['bib_num'] + '%22')
+                # Add the media format icons
+                if itemOn.has_key('format'):
+                    formatIconURL = FORMAT_ICONS.get( itemOn['format'], None)
+                    if formatIconURL: itemOn['format_icon_url'] = formatIconURL
+        else:
+            # Every item that we export, by definition, has a bib_num... but the
+            # field might not be indexed in the proprietary ILS
 
-        # Another ILS may have to use a different field, such as the ones below
-        # Uncomment the one(s) that works for your ILS
-        
+            # {ckey} is the field to search for the catalog key in Unicorn
+            ckey = re.compile('\s(.*)$')
+            bib_num = ckey.search(itemOn['bib_num']).group(1)
+            itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (bib_num, "ckey")
+
+            # Another ILS may have to use a different field, such as the ones below
+            # Uncomment the one(s) that works for your ILS
             # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['isbn_numeric'], "020")
-        # 001 field is our best match option
-        if itemOn.has_key('ctrl_num'):
-            # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['ctrl_num'], "001")
-            pass
 
-        #choose this if you want the local facbackopac view   
-        if itemOn.has_key('bib_num'):
-            itemOn['full_bib_url'] = '/catalog/item/?q=%s&index=bib_num' % ('%22' + itemOn['bib_num'] + '%22')
-        # Add the media format icons
-        if itemOn.has_key('format'):
-            formatIconURL = FORMAT_ICONS.get( itemOn['format'], None)
-            if formatIconURL: itemOn['format_icon_url'] = formatIconURL
+            #if itemOn.has_key('ctrl_num'):
+            # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['ctrl_num'], "001")
 
         #make an array out of Serials Solutions Name and URL
         if itemOn.has_key('SSdata'):

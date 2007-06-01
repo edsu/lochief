@@ -247,7 +247,7 @@ def CopyinfoProcessor( record, marcMap=None, extractor=None):
             
             #set availability status
             #%k = location if unavailable
-            if not recordOn.has_key('k') and recordOn['l']!="DISCARD":
+            if not recordOn.has_key('k') and recordOn.has_key('l') and recordOn['l']!="DISCARD":
                 status = "Available"
             else:
                 status = "Unavailable"
@@ -275,7 +275,7 @@ def AvailabilityProcessor( record, marcMap=None, extractor=None):
             #%k = location if unavailable
          #   if recordOn.has_key('k'):
           #      unavailableflag = true
-            if not recordOn.has_key('k') and recordOn['l']!="DISCARD":
+            if not recordOn.has_key('k') and recordOn.has_key('l') and recordOn['l']!="DISCARD":
                 availableflag = 1
 
         if availableflag == 1:

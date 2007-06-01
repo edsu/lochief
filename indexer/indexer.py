@@ -97,6 +97,7 @@ class recordForSolr:
         self._marcRecordToDictTime = 0
         self._extractionTime = 0
         self._extractorCreateTime = 0
+	self.bib_num = None
         
         if anselUnicodeConverter is None: 
             anselUnicodeConverter = AnselToUnicode()
