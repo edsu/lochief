@@ -229,7 +229,8 @@ def getsearchresults(req):
 
 def reversesortDictValues(adict):
     items = adict.keys()
-    items.sort(reverse=True)
+    items.sort
+    items.reverse()
     return items
 
 def doPagination( page, totalFound, numPerPage ):
