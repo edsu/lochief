@@ -13,6 +13,7 @@ def index(req):
     return render_to_response("index.html", {} )
 
 def makeSearchString(q, index, limits, sort):
+    
     ret = '%s:%s' % (index, q) 
     for limitOn in limits:
         ret = """%s AND %s""" % (ret, limitOn)
@@ -24,9 +25,12 @@ def makeSearchString(q, index, limits, sort):
 def search(req):
     start = time.time()
     ctx = getsearchresults(req)
+    if ctx == None:
+        return HttpResponseRedirect("/catalog/")
     ctx['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
     ctx['LOCAL_INSTITUTION_NAME'] = LOCAL_INSTITUTION_NAME
     # render using appropriate
+    
     if ctx['format'] and ctx['format'] == "py": 
         resp = HttpResponse( pprint.pformat(ctx) )
         resp.headers['Content-Type'] = "text/plain" ; return resp
@@ -37,6 +41,10 @@ def search(req):
 def item(req):
     start = time.time()
     ctx = getitemresults(req)
+    
+    if ctx == None:
+        return HttpResponseRedirect("/catalog/")
+    
     ctx['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
     ctx['LOCAL_INSTITUTION_NAME'] = LOCAL_INSTITUTION_NAME
     # render using appropriate format
@@ -48,11 +56,13 @@ def item(req):
         return render_to_response("item.html", ctx )
 
 def getsearchresults(req): 
-    q = req.GET.get('q', None) 
+    q = req.GET.get('q', None)
+    if q == "*":
+        q = "[* TO *]"
     searchString = q
     limits = []
     if not q:
-        return HttpResponseRedirect("/catalog/")
+        return None
     index = req.GET.get('index', 'text')
     if len( index.strip() ) == 0: 
         index = 'text'
@@ -202,12 +212,7 @@ def getsearchresults(req):
                 del _facets[count]
                 break
             count += 1
-                        
-    
-    
             
-                           
-                            
                     
     ctx['facets']  = _facets
     ctx['indexes'] = SEARCH_INDEXES
@@ -257,7 +262,7 @@ def getitemresults(req):
     searchString = q
     limits = []
     if not q:
-        return HttpResponseRedirect("/catalog/")
+        return None
     index = req.GET.get('index', 'text')
     if len( index.strip() ) == 0: 
         index = 'text'
