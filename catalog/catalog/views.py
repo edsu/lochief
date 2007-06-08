@@ -138,7 +138,11 @@ def getsearchresults(req):
 
             #if itemOn.has_key('ctrl_num'):
             # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['ctrl_num'], "001")
-
+            
+            # Add the media format icons
+            if itemOn.has_key('format'):
+                    formatIconURL = FORMAT_ICONS.get( itemOn['format'], None)
+                    if formatIconURL: itemOn['format_icon_url'] = formatIconURL
         #needed for amazon book covers and isbn to be displayable
         if itemOn.has_key('isbn'):
             itemOn['isbn_numeric'] = ''.join( [ x for x in itemOn['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
