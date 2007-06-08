@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response
 from django.core.cache import cache
 from django.views.decorators.vary import vary_on_headers
 from config import *
-import urllib, pprint, time, re
+import urllib, pprint, time, re, sys, string
 
 facetCodes = [ f['code'] for f in FACETS ]
 allFacets = FACETS
@@ -13,7 +13,8 @@ def index(req):
     return render_to_response("index.html", {} )
 
 def makeSearchString(q, index, limits, sort):
-    
+    if q == "*":
+        q = "[* TO *]"
     ret = '%s:%s' % (index, q) 
     for limitOn in limits:
         ret = """%s AND %s""" % (ret, limitOn)
@@ -57,8 +58,7 @@ def item(req):
 
 def getsearchresults(req): 
     q = req.GET.get('q', None)
-    if q == "*":
-        q = "[* TO *]"
+    
     searchString = q
     limits = []
     if not q:
@@ -139,6 +139,9 @@ def getsearchresults(req):
             #if itemOn.has_key('ctrl_num'):
             # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['ctrl_num'], "001")
 
+        #needed for amazon book covers and isbn to be displayable
+        if itemOn.has_key('isbn'):
+            itemOn['isbn_numeric'] = ''.join( [ x for x in itemOn['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
         #make an array out of Serials Solutions Name and URL
         if itemOn.has_key('SSdata'):
             itemOn['SSurldetails']=[]
@@ -233,10 +236,20 @@ def getsearchresults(req):
     return ctx
 
 def reversesortDictValues(adict):
-    items = adict.keys()
-    items.sort
-    items.reverse()
-    return items
+    #sorts dictionary keys in reverse alphabetical order. Done differently before pythin 2.4 hence
+    #the version checks
+    if sys.version_info[0] >= 2 and sys.version_info[1] >= 4:
+        items = adict.keys()
+        items.sort(reverse=True)
+        return items
+    else:
+        items = adict.keys()
+        items.sort
+        items.reverse()
+        return items
+    
+    
+    
 
 def doPagination( page, totalFound, numPerPage ):
     ret = []

@@ -53,6 +53,48 @@
 	{% endifequal %}
 {% endfor %} 
 </div>
+
+{% for facetOn in facets %}
+
+	{% ifequal facetOn.name 'Topic' %}
+	{% if not limit %}
+	<div class="bluebox">
+		<strong>{% trans "Were You Searching For This Topic?" %}</strong><br />
+				
+					<ul>
+					{% for termOn in facetOn.terms %}
+						
+						<li>&middot;&nbsp;<a href='/catalog/search/?q=%22{{termOn.term}}%22&index={{facetOn.code}}&limit='>
+							{{termOn.term}}
+						</a></li>
+					{% endfor %}
+					
+					</ul>
+					{% if facetOn.has_more %}
+					<ul>
+						<span style="display:none;" id = "facet-list-ext-{{facetOn.code}}">
+							{% for termOn in facetOn.extended_terms %}
+								<li>&middot;&nbsp;<a href='/catalog/search/?q={{termOn.term}}&index={{facetOn.code}}&limit='>
+									{{termOn.term}}
+								</a></li>
+							{% endfor %}
+						</span>
+					{% endif %}
+					</ul>
+				{% if facetOn.has_more %}
+					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">{% trans "Show More..." %}</a>
+					
+				{% endif %}
+				{% endif %}
+				
+				
+
+	{% endifequal %}
+{% endfor %}
+	
+	
+</div>
+
 <div class="facets">
 	{% if removeLimits %}
 		<strong>{% trans "Expand Results:" %}</strong><br />
@@ -67,7 +109,8 @@
 			</div>
 		<br />
 	{% endif %} 
-	<strong>{% trans "Narrow Results:" %}</strong><br /><br />
+	 
+	
 	{% for facetOn in facets %}
 		{% ifequal facetOn.facetlocation 'sidebar' %}
 		{% if facetOn.terms %}
@@ -119,7 +162,7 @@
 		    {% if docOn.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{docOn.isbn_numeric}}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
 	</td>
 	<td align="left" width="80%">
-		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>	
+		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
 		<div class="author">
 			{% if docOn.author %}
 				{%trans "by" %} {% for authorOn in docOn.author %}<a href='/catalog/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %}; {% endif %}{% endfor %}
@@ -127,7 +170,7 @@
 		</div>
 		<div class="publisher">
 			<a href='/catalog/search/?q={{docOn.publisher}}&index=publisher'>{{docOn.publisher}}</a> 
-			{%if docOn.pubdate %}: {% endif %}<a href='/catalog/search/?q={{docOn.pubdate}}&index=pubdate'>{{docOn.pubdate}}</a>
+			{%if docOn.pubdate %}: {% endif %}<a href='/catalog/search/?q={{docOn.pubdate}}&index=pubdate'>{{docOn.pubdate}}</a> 
 		</div>
 		<div class="callnum">
 			{%if docOn.LCClass %}
