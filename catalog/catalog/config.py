@@ -12,19 +12,19 @@ OPAC_FULL_BIB_URL = "http://sirsiweb.laurentian.ca/uhtbin/cgisirsi/x/x/x/57/5/?u
 # LOCAL_ITEM_DISPLAY has two settings:
 # 0 : Make item title a link to the detailed view in vendor catalog
 # 1 : Make item title a link to the detailed view in fac-back-opac
-LOCAL_ITEM_DISPLAY = 0
+LOCAL_ITEM_DISPLAY = 1
 
 #FACETS has several settings.
 #name = Display name on the opac
 #code = solr field name
 #sortbycount = whether you want the facets sorted by count. Values can be true, false, and reverse (for reverse alphabetical order)
 #facetlocation =  can be used to display facets in different areas of the screen, as determined by your template. Was originally made to put dewey/lc callnum ranges on top of screen like NCSU
-FACETS = [    { 'name' : _('Dewey Call Number Range 100s'), 'code' : 'callnumlayerone', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'},
-              { 'name' : _('Dewey Call Number Range 10s'), 'code' : 'callnumlayertwo', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'}, 
-              { 'name' : _('Subject: Topic'), 'code' : 'topic', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },    
-              { 'name' : _('Subject: Genre'), 'code' : 'genre', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'},                            
+FACETS = [    { 'name' : _('Dewey Range'), 'code' : 'callnumlayerone', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'},
+              { 'name' : _('Dewey Range'), 'code' : 'callnumlayertwo', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'}, 
+              { 'name' : _('Topic'), 'code' : 'topic', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },    
+              { 'name' : _('Genre'), 'code' : 'genre', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'},                            
               { 'name' : _('Format'), 'code' : 'format', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },                         
-              { 'name' : _('Subject: Region'), 'code' : 'place' , 'sortbycount' : 'true', 'facetlocation' : 'sidebar'},    
+              { 'name' : _('Region'), 'code' : 'place' , 'sortbycount' : 'true', 'facetlocation' : 'sidebar'},    
               { 'name' : _('Language'), 'code' : 'language', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'}, 
               { 'name' : _('Author'), 'code' : 'author_exact','sortbycount' : 'false' , 'facetlocation' : 'sidebar' },
               { 'name' : _('Publication Date'), 'code' : 'pubdaterange', 'sortbycount' : 'reverse', 'facetlocation' : 'sidebar' },
