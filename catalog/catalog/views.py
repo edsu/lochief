@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.core.cache import cache
+from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
 from django.views.decorators.vary import vary_on_headers
 from config import *
 import urllib, pprint, time, re, sys, string
@@ -56,6 +57,38 @@ def item(req):
         ctx['response_time'] = "%.4f" % ( time.time() - start )
         return render_to_response("item.html", ctx )
 
+def feedCreator(ctx, feed):
+    """Generates the list of items for the syndication feed for shared searches.
+    
+    Returns an XML string."""
+    for itemOn in ctx['response']['docs']:
+        desc = ""
+    	if itemOn.has_key('summary'):
+	    desc = " / ".join(itemOn['summary'])
+	elif itemOn.has_key('contents'):
+	    desc = " / ".join(itemOn['contents'])
+	elif itemOn.has_key('topic'):
+	    desc = " / ".join(itemOn['topic'])
+    	feed.add_item(itemOn['title'], itemOn['full_bib_url'], desc, None, " / ".join(itemOn['author']))
+    return HttpResponse(feed.writeString('utf8'))
+
+def atomFeed(req):
+    """Generates an Atom syndication feed for shared searches.
+    
+    Returns an XML string."""
+    ctx = getsearchresults(req)
+    feed = Atom1Feed(_('Search: ') + ctx['q'], u'/catalog/feed/atom/', _('Fac-Back-OPAC Search in Atom syndication'))
+    return feedCreator(ctx, feed)
+
+   
+def rssFeed(req):
+    """Generates an RSS2 syndication feed for shared searches.
+    
+    Returns an XML string."""
+    ctx = getsearchresults(req)
+    feed = Rss201rev2Feed(_('Search: ') + ctx['q'], u'/catalog/feed/rss/', _('Fac-Back-OPAC Search in RSS2 syndication'))
+    return feedCreator(ctx, feed)
+
 def getsearchresults(req): 
     q = req.GET.get('q', None)
     
@@ -98,10 +131,9 @@ def getsearchresults(req):
     ctx['format'] = format;
     ctx['limit']=limits
     ctx['searchstring']=searchString
-    print ctx
+    ctx['get'] = req.META['QUERY_STRING']
     numFound = ctx['response']['numFound']
     endNum = min( numFound, ITEMS_PER_PAGE * (page + 1) )
-    ctx['searchString'] = searchString
     ctx['q'] = q
     if limit is not None: ctx['currentLimit'] = limit.replace('"', '%22')
     if sort is not None: ctx['currentSort'] = sort
@@ -251,8 +283,6 @@ def reversesortDictValues(adict):
         items.sort
         items.reverse()
         return items
-    
-    
     
 
 def doPagination( page, totalFound, numPerPage ):

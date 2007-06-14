@@ -1,6 +1,10 @@
 {% load i18n %}
 <html><head>
 	<title>{% block title %}{% trans "Laurentian University Libraries" %}{% endblock %}</title>
+	{% if searchstring %}
+	<link rel="alternate" type="application/atom+xml" href="/catalog/feed/atom/?{{get}}" />
+	<link rel="alternate" type="application/rss+xml" href="/catalog/feed/rss/?{{get}}" />
+	{% endif %}
 	<style> .record { width: 99%; border-bottom: 1px solid #b3b9bf;  }
 		.jacket { float: left; }
 		.topbar { padding: 5px; border-bottom: 1px solid #b3b9bf; /*background-color: #d1e0ef;*/ margin-bottom: 5px;}
@@ -38,7 +42,12 @@
 			window.location = document.sortForm.sortField[sortIndex].value; };
 		var showMore = function( facetCode ) {
 			$("facet-list-ext-" + facetCode).style.display = "block";
-			$('showmore-' + facetCode).style.display = "none"; };
+			$('showmore-' + facetCode).style.display = "none";
+			$('showfewer-' + facetCode).style.display = "block"; };
+		var showFewer = function( facetCode ) {
+			$("facet-list-ext-" + facetCode).style.display = "none";
+			$('showmore-' + facetCode).style.display = "block";
+			$('showfewer-' + facetCode).style.display = "none"; };
 	</script>
 </head>
 <body {% block bodyonload %}onload="setFocus();"{% endblock %}>

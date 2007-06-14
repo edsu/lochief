@@ -83,6 +83,7 @@
 					</ul>
 				{% if facetOn.has_more %}
 					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">{% trans "Show More..." %}</a>
+					<a href="#" id="showfewer-{{facetOn.code}}" style="display: none" onclick="showFewer('{{facetOn.code}}');">{% trans "Show Fewer..." %}</a>
 					
 				{% endif %}
 				{% endif %}
@@ -134,6 +135,7 @@
 					</ul>
 				{% if facetOn.has_more %}
 					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">{% trans "Show More..." %}</a>
+					<a href="#" id="showfewer-{{facetOn.code}}" style="display: none" onclick="showFewer('{{facetOn.code}}');">{% trans "Show Fewer..." %}</a>
 					
 				{% endif %}
 			</div>
