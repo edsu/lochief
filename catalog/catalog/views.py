@@ -61,15 +61,25 @@ def feedCreator(ctx, feed):
     """Generates the list of items for the syndication feed for shared searches.
     
     Returns an XML string."""
+
     for itemOn in ctx['response']['docs']:
-        desc = ""
+    	author = u""
+        desc = u""
+	title = u""
+
+	if itemOn.has_key('title'):
+            title = itemOn['title']
+
+	if itemOn.has_key('author'):
+            author = " / ".join(itemOn['author'])
+
     	if itemOn.has_key('summary'):
 	    desc = " / ".join(itemOn['summary'])
 	elif itemOn.has_key('contents'):
 	    desc = " / ".join(itemOn['contents'])
 	elif itemOn.has_key('topic'):
 	    desc = " / ".join(itemOn['topic'])
-    	feed.add_item(itemOn['title'], itemOn['full_bib_url'], desc, None, " / ".join(itemOn['author']))
+    	feed.add_item(title, itemOn['full_bib_url'], desc, None, author)
     return HttpResponse(feed.writeString('utf8'))
 
 def atomFeed(req):
