@@ -1,6 +1,7 @@
 # this is where your custom processors go.  They must have record as required argument and
 # marcMap and extractor as optional named arguments.  Don't like it?  Go write your own indexer.
 from config.codes import *
+
 def genreProcessor( record, marcMap=None, extractor=None):
     # todo: change to use extractor
     ret = None
@@ -25,6 +26,23 @@ def deweyClassProcessor( record, marcMap=None, extractor=None):
             if len(numsOn) > 2:
                 return numsOn[:3]
     return None
+
+def isbnProcessor( record, marcMap=None, extractor=None):
+    import re
+    isbn = extractor.extract( marcMap )
+    ret = None
+        
+    isbnRegexes = [r"""\d{9}[X0-9]""","""\d{13}"""]
+
+    for regexOn in isbnRegexes:
+        for isbnOn in isbn:
+            isbnOn.replace('-','')
+            resultOn = re.findall( regexOn, isbnOn )
+            if len(resultOn) >= 1:
+                return resultOn[0]
+    if ret is None and isbn <> []:
+        print "could not parse isbn from <<%s>> for isbn" % isbn
+    return ret
 
 def LCClassProcessor( record, marcMap=None, extractor=None):
     callNum = extractor.extract( marcMap )
