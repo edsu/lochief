@@ -3,7 +3,7 @@
 {% block title %}{% blocktrans %}{{LOCAL_INSTITUTION_NAME}} Search on {{q}}{% endblocktrans %}{% endblock %}
 {% block body %}
 		<div class="searchform">
-		<form name="s" method="GET" action = "/catalog/search">
+		<form name="s" method="GET" action="/catalog/search">
 			<span class="logo"><a href="/catalog/"><img src={{LOCAL_LOGO_LOCATION}} /></a></span> 
 			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
 			<select name="index" id="id_index"> 
@@ -21,7 +21,7 @@
 				{% blocktrans with response.numFound as numFound %}Results <strong>{{startNum}}-{{endNum}}</strong> of&nbsp;&nbsp;<strong>{{numFound}}</strong> for {{q}} ({{response_time}} seconds){% endblocktrans %}
 			</td>
 			<td align="right" valign="center">
-				<form name="sortForm"><strong>{% trans "Sort by:" %}</strong>
+				<form name="sortForm" accept-charset="utf-8"><strong>{% trans "Sort by:" %}</strong>
 					<select name="sortField" onchange="doSort()">
 						<option value="?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}">{% trans "Relevance" %}</option>
 						{% for sortOn in sorts %}
@@ -72,7 +72,7 @@
 					</ul>
 					{% if facetOn.has_more %}
 					<ul>
-						<span style="display:none;" id = "facet-list-ext-{{facetOn.code}}">
+						<span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
 							{% for termOn in facetOn.extended_terms %}
 								<li>&middot;&nbsp;<a href='/catalog/search/?q={{termOn.term}}&index={{facetOn.code}}&limit='>
 									{{termOn.term}}
@@ -124,7 +124,7 @@
 						</a> ({{termOn.count}})</li>
 					{% endfor %}
 					{% if facetOn.has_more %}
-						<span style="display:none;" id = "facet-list-ext-{{facetOn.code}}">
+						<span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
 							{% for termOn in facetOn.extended_terms %}
 								<li>&middot;&nbsp;<a href='/catalog/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:&quot;{{termOn.term}}&quot;'>
 									{{termOn.term}}

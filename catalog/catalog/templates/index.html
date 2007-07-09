@@ -56,8 +56,23 @@
 			<span class="logo"><img src="http://www.laurentian.ca/Laurentian.WCMSPortal/Inc/images/logo_laurentian.jpg" /></span>
 			</h2>
 		<form name="s" method="GET" action = "/catalog/search/">
-			<input type="text" id="id_term" name="q" size="20" maxlength="40" value="" />
+<table>
+			<tr><td><strong>Search keywords</strong>:</td><td><input type="text" id="id_term" name="q" size="20" maxlength="40" value="" /> </td></tr>
+			<tr><td><strong>Library</strong>:</td><td><select id="libraryselect" size="3" name="limit">
+				<option selected value="">All libraries</option>
+				<option value="location:ALGO*">Algoma</option>
+				<option value="location:DESM*">Desmarais</option>
+				<option value="location:EDUC*">Education</option>
+				<option value="location:HUNT*">Huntington</option>
+				<option value="location:MEDB*">Mining Environment Database</option>
+				<option value="location:NOSM*">Northern Ontario School of Medicine</option>
+				<option value="location:HRST*">Universite de Hearst</option>
+				<option value="location:SUDB*">University of Sudbury</option>
+				<option value="location:FALC*">Xstrata Falconbridge</option>
+			</select></td>
+</table>
 			<input type="submit" value={%trans "Search" %} class="searchbutton" />		
+
 		</form>
 	</center>{% endblock %}
 </body>

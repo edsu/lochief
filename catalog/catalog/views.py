@@ -2,6 +2,8 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
 from django.core.cache import cache
 from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
+from django.utils.encoding import iri_to_uri
+from django.utils.http import urlquote
 from django.views.decorators.vary import vary_on_headers
 from config import *
 import urllib, pprint, time, re, sys, string
@@ -21,7 +23,7 @@ def makeSearchString(q, index, limits, sort):
         ret = """%s AND %s""" % (ret, limitOn)
     if sort is not None and len(sort) > 0:
         ret = """%s ; %s""" % (ret, sort) 
-    return urllib.quote( ret )     # the quote() function is crucial to allow Unicode to work in URLs
+    return iri_to_uri(urlquote(ret))
 
 @vary_on_headers('accept-language', 'accept-encoding')
 def search(req):

@@ -3,7 +3,7 @@
 {% block title %}{% blocktrans %}{{LOCAL_INSTITUTION_NAME}} Search on {{q}}{% endblocktrans %}{% endblock %}
 {% block body %}
 		<div class="searchform">
-		<form name="s" method="GET" action = "/catalog/search">
+		<form name="s" method="GET" action="/catalog/search">
 			<span class="logo"><a href="/catalog/"><img src={{LOCAL_LOGO_LOCATION}} /></a></span> 
 			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
 			<select name="index" id="id_index"> 

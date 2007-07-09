@@ -13,10 +13,13 @@ DATABASE_PORT = ''
 
 TIME_ZONE = "PST8PDT"
 
-CACHE_BACKEND = 'simple:///'
+#CACHE_BACKEND = 'simple:///'
+#CACHE_BACKEND = 'locmem:///'
+CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 CACHE_MIDDLEWARE_SECONDS = 3600
 
 LANGUAGE_CODE = 'en-us'
+DEFAULT_CHARSET='utf-8'
 SITE_ID = 1 
 MEDIA_URL = ''
 ADMIN_MEDIA_PREFIX = '/media/'
@@ -32,11 +35,11 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.cache.CacheMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.doc.XViewMiddleware",
     "django.middleware.gzip.GZipMiddleware",
-    "django.middleware.cache.CacheMiddleware",
 )
 
 ROOT_URLCONF = 'urls'
