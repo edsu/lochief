@@ -25,7 +25,6 @@ msgid "English"
 msgstr "anglais"
 
 #: catalog/views.py:92 catalog/views.py:101
-#, fuzzy
 msgid "Search: "
 msgstr "Recherche : "
 
@@ -198,9 +197,8 @@ msgid "Show More..."
 msgstr "Montrer plus..."
 
 #: catalog/templates/search.html:86 catalog/templates/search.html.py:138
-#, fuzzy
 msgid "Show Fewer..."
-msgstr "Montrer plus..."
+msgstr "Montrer moins..."
 
 #: catalog/templates/search.html:101
 msgid "Expand Results:"
