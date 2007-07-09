@@ -191,7 +191,7 @@ msgstr "Pertinence"
 
 #: catalog/templates/search.html:62
 msgid "Were You Searching For This Topic?"
-msgstr "Recherchez-vous cetter matière?"
+msgstr "Recherchez-vous cette matière?"
 
 #: catalog/templates/search.html:85 catalog/templates/search.html.py:137
 msgid "Show More..."
