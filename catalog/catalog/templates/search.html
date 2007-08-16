@@ -74,7 +74,7 @@
 					<ul>
 						<span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
 							{% for termOn in facetOn.extended_terms %}
-								<li>&middot;&nbsp;<a href='/catalog/search/?q={{termOn.term}}&index={{facetOn.code}}&limit='>
+								<li>&middot;&nbsp;<a href='/catalog/search/?q=%22{{termOn.term}}%22&index={{facetOn.code}}&limit='>
 									{{termOn.term}}
 								</a></li>
 							{% endfor %}
