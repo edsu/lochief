@@ -30,16 +30,26 @@ def deweyClassProcessor( record, marcMap=None, extractor=None):
 def isbnProcessor( record, marcMap=None, extractor=None):
     import re
     isbn = extractor.extract( marcMap )
+    #if isbn <> []:
+    #    print isbn
     ret = None
-        
-    isbnRegexes = [r"""\d{9}[X0-9]""","""\d{13}"""]
+    found = 'false'
+    resultOn = []
+    isbnRegexes = [r"""\b\d{13}\b""",r"""\b\d{9}[X0-9]\b"""]
 
-    for regexOn in isbnRegexes:
-        for isbnOn in isbn:
-            isbnOn.replace('-','')
-            resultOn = re.findall( regexOn, isbnOn )
-            if len(resultOn) >= 1:
-                return resultOn[0]
+    for isbnOn in isbn:
+        for regexOn in isbnRegexes:
+            if found <> 'true':
+                isbnOn.replace('-','')
+                reresults = re.findall( regexOn, isbnOn )
+                for result in reresults:
+                    resultOn.append(result)
+                    if result <> '':
+                        found = 'true'
+            
+        if len(resultOn) >= 1:
+            #print resultOn
+            return resultOn
     if ret is None and isbn <> []:
         print "could not parse isbn from <<%s>> for isbn" % isbn
     return ret
@@ -313,37 +323,39 @@ def DeweyCallnumlayer1Processor( record, marcMap=None, extractor=None):
     callNum = None
     recrodDeweyNum = None
     callNum = extractor.extract( marcMap )
-    callNum = str(callNum[0])
-    deweyranges = range(0,900,100)
-    recordDeweyNum = callNum[:3]
+    if callNum:
+        callNum = str(callNum[0])
+        deweyranges = range(0,900,100)
+        recordDeweyNum = callNum[:3]
     #find the description for the dewey range
-    if DEWEY_MAP.has_key(str(recordDeweyNum[:1] + '00')):
-        deweydescription = DEWEY_MAP[str(recordDeweyNum[:1] + '00')]
+        if DEWEY_MAP.has_key(str(recordDeweyNum[:1] + '00')):
+            deweydescription = DEWEY_MAP[str(recordDeweyNum[:1] + '00')]
     
     #write the dewey range and description to the index
-    try:
-        for i in deweyranges:
-            if int(recordDeweyNum) >= i and int(recordDeweyNum) < i + 100:
-                return "%s-%s - %s" % (i,i+99,deweydescription.replace('&','and'))
-    except:
-        return None
+        try:
+            for i in deweyranges:
+                if int(recordDeweyNum) >= i and int(recordDeweyNum) < i + 100:
+                    return "%s-%s - %s" % (i,i+99,deweydescription.replace('&','and'))
+        except:
+            return None
                 
 
 #used to create browse by call num functionality-layer 2 is subset of 1st layer (ex. Dewey 100-110, 110-120, etc.)
 def DeweyCallnumlayer2Processor( record, marcMap=None, extractor=None):
         #insert dewey processor here
         callNum = extractor.extract( marcMap )
-        callNum = str(callNum[0])
-        deweyranges = range(0,990,10)
-        recordDeweyNum = callNum[:3]
-        #find the description for the dewey range
-        if DEWEY_MAP.has_key(str(recordDeweyNum[:2] + '0')):
-            deweydescription = DEWEY_MAP[str(recordDeweyNum[:2] + '0')]
+        if callNum:
+            callNum = str(callNum[0])
+            deweyranges = range(0,990,10)
+            recordDeweyNum = callNum[:3]
+            #find the description for the dewey range
+            if DEWEY_MAP.has_key(str(recordDeweyNum[:2] + '0')):
+                deweydescription = DEWEY_MAP[str(recordDeweyNum[:2] + '0')]
             
-        #write the dewey range and description to the index
-        try:
-            for i in deweyranges:
-                if int(recordDeweyNum) >= i and int(recordDeweyNum) < i + 10:
-                    return "%s-%s - %s" % (i,i+9,deweydescription.replace('&','and'))
-        except:
-            return None
+            #write the dewey range and description to the index
+            try:
+                for i in deweyranges:
+                    if int(recordDeweyNum) >= i and int(recordDeweyNum) < i + 10:
+                        return "%s-%s - %s" % (i,i+9,deweydescription.replace('&','and'))
+            except:
+                return None
