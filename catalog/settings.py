@@ -1,28 +1,31 @@
+ugettext = lambda s: s
+
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 DEBUG= True
 TEMPLATE_DEBUG = DEBUG
 ADMINS = ( )
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = ''
-DATABASE_NAME = ''
-DATABASE_USER = ''
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''
-DATABASE_PORT = ''
+DATABASE_ENGINE = 'postgresql'
+DATABASE_NAME = 'fbo'
+DATABASE_USER = 'fbo'
+DATABASE_PASSWORD = 'fbo'
+DATABASE_HOST = 'localhost'
+DATABASE_PORT = '5432'
+
 
 TIME_ZONE = "PST8PDT"
 
-CACHE_BACKEND = 'simple:///'
+#CACHE_BACKEND = 'simple:///'
 #CACHE_BACKEND = 'locmem:///'
-#CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 CACHE_MIDDLEWARE_SECONDS = 3600
 
 DEFAULT_CHARSET='utf-8'
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
-    ('fr', _('French')),
-    ('en', _('English')),
+    ('fr', ugettext('French')),
+    ('en', ugettext('English')),
 )
 
 SITE_ID = 1 
@@ -52,4 +55,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATE_DIRS = (
 )
 
-INSTALLED_APPS = ('catalog')
+INSTALLED_APPS = (
+    'django.contrib.sessions',
+    'catalog'
+)
