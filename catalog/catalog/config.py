@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext as _
+
 SOLR_SERVER = "localhost:8983"
 SEARCH_CACHE_TIME = 6000    # in seconds
 ITEMS_PER_PAGE = 10
