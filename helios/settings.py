@@ -13,7 +13,6 @@ DATABASE_PASSWORD = 'fbo'
 DATABASE_HOST = 'localhost'
 DATABASE_PORT = '5432'
 
-
 TIME_ZONE = "PST8PDT"
 
 #CACHE_BACKEND = 'simple:///'
@@ -43,7 +42,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     "django.middleware.common.CommonMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.cache.CacheMiddleware",
+    #"django.middleware.cache.CacheMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.doc.XViewMiddleware",
