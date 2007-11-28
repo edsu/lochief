@@ -18,8 +18,8 @@ TIME_ZONE = "PST8PDT"
 
 #CACHE_BACKEND = 'simple:///'
 #CACHE_BACKEND = 'locmem:///'
-CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
-CACHE_MIDDLEWARE_SECONDS = 3600
+#CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+#CACHE_MIDDLEWARE_SECONDS = 3600
 
 DEFAULT_CHARSET='utf-8'
 LANGUAGE_CODE = 'en-us'
@@ -50,12 +50,12 @@ MIDDLEWARE_CLASSES = (
     "django.middleware.gzip.GZipMiddleware",
 )
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'helios.urls'
 
 TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
     'django.contrib.sessions',
-    'catalog'
+    'helios.catalog'
 )
