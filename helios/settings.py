@@ -70,5 +70,6 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'django.contrib.sessions',
-    'helios.catalog'
+    'helios.discovery',
+    'helios.catalog',
 )
