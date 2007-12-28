@@ -15,5 +15,6 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
+    (r'', include('helios.discovery.urls')),
     (r'^catalog/', include('helios.catalog.urls')),
 )

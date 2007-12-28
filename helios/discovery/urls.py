@@ -14,6 +14,10 @@
 
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('helios.catalog.views',
-    (r'^$', 'item'),
+urlpatterns = patterns('helios.discovery.views',
+    (r'^$', 'index'),
+    (r'^search/$', 'search'),
+    (r'^feed/atom/$', 'atomFeed'),
+    (r'^feed/rss/$', 'rssFeed'),
 )
+
