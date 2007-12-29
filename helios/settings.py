@@ -17,6 +17,8 @@
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+BASE_URL = 'http://localhost:8000/helios'
+
 DEBUG= True
 TEMPLATE_DEBUG = DEBUG
 
@@ -60,12 +62,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = BASE_DIR + '/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = BASE_URL + '/media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -92,10 +94,21 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'helios.urls'
 
-TEMPLATE_DIRS = ()
+TEMPLATE_DIRS = (
+    BASE_DIR + '/tempates/',
+)
 
 INSTALLED_APPS = (
     'django.contrib.sessions',
     'helios.discovery',
     'helios.catalog',
 )
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'helios.context_processors.base_url',
+)
+
