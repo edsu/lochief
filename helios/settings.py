@@ -16,20 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-# Django settings for Helios project.
+# Django settings for the Helios project.
 
 import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-BASE_URL = 'http://localhost:8000/helios'
 
 DEBUG= True
 TEMPLATE_DEBUG = DEBUG
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_URL = 'http://localhost:8000/helios'
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
-
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
