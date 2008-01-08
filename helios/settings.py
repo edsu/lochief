@@ -24,7 +24,7 @@ DEBUG= True
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_URL = 'http://localhost:8000/helios'
+BASE_URL = 'http://localhost:8000'
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -75,7 +75,7 @@ MEDIA_URL = BASE_URL + '/media/'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/admin/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'cr7)b7e+bq*u%a6f8a2d_rrcd3r_r@d3u32c-1*4^mk6fc0fsl'

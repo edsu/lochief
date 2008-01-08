@@ -28,6 +28,7 @@ from django.shortcuts import render_to_response
 from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
 from django.core.cache import cache
+from django.template import RequestContext
 
 from config import ITEMS_PER_PAGE, FACETS, SOLR_SERVER, MAX_FACET_TERMS_EXPANDED, SEARCH_CACHE_TIME, MAX_FACET_TERMS_BASIC, SEARCH_INDEXES, SORTS, LOCAL_LOGO_LOCATION, LOCAL_INSTITUTION_NAME, LOCAL_ITEM_DISPLAY, FORMAT_ICONS
 
@@ -38,17 +39,8 @@ allFacets = FACETS
 def index(request):
     context = {}
     context['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
-    return render_to_response('index.html', context)
-
-def makeSearchString(q, index, limits, sort):
-    if q == "*":
-        q = "[* TO *]"
-    ret = '%s:%s' % (index, q) 
-    for limitOn in limits:
-        ret = """%s AND %s""" % (ret, limitOn)
-    if sort is not None and len(sort) > 0:
-        ret = """%s ; %s""" % (ret, sort) 
-    return iri_to_uri(urlquote(ret))
+    return render_to_response('index.html', context, 
+            context_instance=RequestContext(request))
 
 @vary_on_headers('accept-language', 'accept-encoding')
 def search(request):
@@ -65,7 +57,18 @@ def search(request):
         resp.headers['Content-Type'] = "text/plain" ; return resp
     else:
         context['response_time'] = "%.4f" % ( time.time() - start )
-        return render_to_response("search.html", context )
+        return render_to_response("search.html", context,
+                context_instance=RequestContext(request))
+
+def makeSearchString(q, index, limits, sort):
+    if q == "*":
+        q = "[* TO *]"
+    ret = '%s:%s' % (index, q) 
+    for limitOn in limits:
+        ret = """%s AND %s""" % (ret, limitOn)
+    if sort is not None and len(sort) > 0:
+        ret = """%s ; %s""" % (ret, sort) 
+    return iri_to_uri(urlquote(ret))
 
 def getsearchresults(request): 
     q = request.GET.get('q', None)

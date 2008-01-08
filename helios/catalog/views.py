@@ -1,4 +1,5 @@
 # Copyright 2007 Casey Durfee
+# Copyright 2008 Gabriel Farrell
 #
 # This file is part of Helios.
 # 
@@ -15,27 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
+import urllib, pprint, time
+
+from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response
-from django.core.cache import cache
+from django.template import RequestContext
 from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
 from django.views.decorators.vary import vary_on_headers
+
 from config import *
-import urllib, pprint, time
 
 facetCodes = [ f['code'] for f in FACETS ]
 allFacets = FACETS
-
-def makeSearchString(q, index, limits, sort):
-    if q == "*":
-        q = "[* TO *]"
-    ret = '%s:%s' % (index, q) 
-    for limitOn in limits:
-        ret = """%s AND %s""" % (ret, limitOn)
-    if sort is not None and len(sort) > 0:
-        ret = """%s ; %s""" % (ret, sort) 
-    return iri_to_uri(urlquote(ret))
 
 @vary_on_headers('accept-language', 'accept-encoding')
 def item(request):
@@ -54,7 +48,18 @@ def item(request):
         resp.headers['Content-Type'] = "text/plain" ; return resp
     else:
         context['response_time'] = "%.4f" % ( time.time() - start )
-        return render_to_response("item.html", context )
+        return render_to_response("item.html", context,
+                context_instance=RequestContext(request))
+
+def makeSearchString(q, index, limits, sort):
+    if q == "*":
+        q = "[* TO *]"
+    ret = '%s:%s' % (index, q) 
+    for limitOn in limits:
+        ret = """%s AND %s""" % (ret, limitOn)
+    if sort is not None and len(sort) > 0:
+        ret = """%s ; %s""" % (ret, sort) 
+    return iri_to_uri(urlquote(ret))
 
 def getitemresults(request):
     start = time.time()

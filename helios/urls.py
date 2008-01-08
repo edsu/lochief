@@ -18,7 +18,10 @@
 
 from django.conf.urls.defaults import *
 
+import settings
+
 urlpatterns = patterns('',
-    (r'', include('helios.discovery.urls')),
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     (r'^catalog/', include('helios.catalog.urls')),
+    (r'', include('helios.discovery.urls')),
 )
