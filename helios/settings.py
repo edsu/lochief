@@ -24,7 +24,7 @@ DEBUG= True
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_URL = 'http://localhost:8000'
+BASE_URL = ''
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
