@@ -18,11 +18,10 @@
 {% endcomment %}
 {% load i18n %}
 {% extends "index.html" %}
-{% block title %}{% blocktrans %}{{LOCAL_INSTITUTION_NAME}} Search on {{q}}{% endblocktrans %}{% endblock %}
-{% block body %}
+{% block title %}{% blocktrans %}Helios Search on {{q}}{% endblocktrans %}{% endblock %} {% block body %}
 		<div class="searchform">
 		<form name="s" method="GET" action="/search/">
-			<span class="logo"><a href="/"><img src="{{LOCAL_LOGO_LOCATION}}" /></a></span> 
+			<span class="logo"><a href="/">Helios</a></span> 
 			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
 			<select name="index" id="id_index"> 
 				{% for indexOn in indexes %}

@@ -20,7 +20,7 @@
 {% load i18n %}
 <html>
   <head>
-    <title>{% block title %}{% trans "University Libraries" %}{% endblock %}</title>
+    <title>{% block title %}{% trans "Helios" %}{% endblock %}</title>
     {% if searchstring %}
     <link rel="alternate" type="application/atom+xml" href="/catalog/feed/atom/?{{get}}" />
     <link rel="alternate" type="application/rss+xml" href="/catalog/feed/rss/?{{get}}" />
@@ -74,7 +74,7 @@
   <body {% block bodyonload %}onload="setFocus();"{% endblock %}>
   {% block body %}
   <div class="searchpage">
-    <span class="logo">University Libraries</span>
+    <span class="logo">Helios</span>
     <form name="s" method="GET" action = "/search/">
       <p>
         <label for="id_term">Search keywords:</label> <input type="text" id="id_term" name="q" size="20" maxlength="40" value="" />
