@@ -101,7 +101,6 @@ def pubdateProcessor( record, marcMap=None, extractor=None):
 def pubdaterangeProcessor( record, marcMap=None, extractor=None):
     import re
     pubdate = extractor.extract(marcMap)
-    ret = None
     if type(pubdate) == type([]):
         if (len(pubdate) > 0):
             pubdate = pubdate[0]    # TODO: make it handle multiple pubdates, or pick the 'best' one or something
@@ -113,15 +112,14 @@ def pubdaterangeProcessor( record, marcMap=None, extractor=None):
         resultOn = re.findall( regexOn, pubdate )
         if len(resultOn) >= 1:
             # TODO: decide if there are > 1 viable results, if we should just take the 1st one like this...
-            count = 0
+            count = 1
             dateranges = range(0,2050,10)
             for i in dateranges:
-                if int(resultOn[0]) >= dateranges[count] and int(resultOn[0]) < dateranges[count + 1]:
-                    return "%s-%s" % (dateranges[count],(dateranges[count + 1]-1))
+                if int(resultOn[0]) >= dateranges[count - 1] and int(resultOn[0]) < dateranges[count]:
+                    return "%s-%s" % (dateranges[count - 1],(dateranges[count]-1))
                 count += 1
-    if ret is None:
-        print "could not parse pubdate from <<%s>> for pubdaterange" % pubdate
-    return ret
+    print "could not parse pubdate from <<%s>> for pubdaterange" % pubdate
+    return None
 
 def formatProcessor( record, marcMap=None, extractor=None):
     serialsFrequencies = [ 'b', 'c', 'd','e','f','i','j','m','q','s','t','w']
