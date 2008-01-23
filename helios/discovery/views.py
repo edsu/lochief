@@ -106,7 +106,10 @@ def getsearchresults(request):
         facetURLTerm = '&facet.field='.join(facetCodes)   
         urlToGet = "http://%s/solr/select?q=%s&wt=python&facet.field=%s%s&facet.zeros=false&facet=true&facet.limit=%s&start=%s" % ( SOLR_SERVER, searchString, facetURLTerm, facetsortTerm, MAX_FACET_TERMS_EXPANDED, startNumZeroIndex )
         
-        data = urllib.urlopen( urlToGet ).read()
+        try:
+            data = urllib.urlopen( urlToGet ).read()
+        except IOError:
+            raise IOError, 'Unable to connect to the Solr instance.'
         cache.set( cacheKey, data, SEARCH_CACHE_TIME )
     context = eval(data) 
     context['format'] = format;
