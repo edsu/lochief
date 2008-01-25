@@ -1,5 +1,6 @@
 {% comment %}
   Copyright 2007 Casey Durfee
+  Copyright 2008 Gabriel Sean Farrell
 
   This file is part of Helios.
 
@@ -17,236 +18,220 @@
   along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 {% load i18n %}
-{% extends "index.html" %}
-{% block title %}{% blocktrans %}Helios Search on {{q}}{% endblocktrans %}{% endblock %} {% block body %}
-		<div class="searchform">
-		<form name="s" method="GET" action="/search/">
-			<span class="logo"><a href="/">Helios</a></span> 
-			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
-			<select name="index" id="id_index"> 
-				{% for indexOn in indexes %}
-					<option value="{{indexOn.index}}" {% ifequal indexOn.index currentIndex%}selected="true"{% endifequal %}>{{indexOn.name}}</option>
-				{% endfor %}
-			</select>
-			<input type="submit" value={%trans "Search" %} class="searchbutton" />		
-		</form>
-		</div>
-<div class="topbar">
-	<table width="100%">
-		<tr>
-			<td>
-				{% blocktrans with response.numFound as numFound %}Results <strong>{{startNum}}-{{endNum}}</strong> of&nbsp;&nbsp;<strong>{{numFound}}</strong> for {{q}} ({{response_time}} seconds){% endblocktrans %}
-			</td>
-			<td align="right" valign="center">
-				<form name="sortForm" accept-charset="utf-8"><strong>{% trans "Sort by:" %}</strong>
-					<select name="sortField" onchange="doSort()">
-						<option value="?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}">{% trans "Relevance" %}</option>
-						{% for sortOn in sorts %}
-							<option {% if sortOn.selected %}selected="true"{% endif %} value='?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{sortOn.field}}%20{{sortOn.direction}}'>{{sortOn.name}}</option>
-						{% endfor %}
-					</select>
-				</form>
-			</td>
-		</tr>
-	</table>	
-</div>
-
- 	
-{% for facetOn in facets %}
-	{% ifequal facetOn.facetlocation 'topbar' %}
-	<div class="topbarfacets">
-		{% if facetOn.terms %}
-		<div class="facet-list" id="facet-list-{{facetOn.code}}">
-				<strong>{{facetOn.name}}</strong>
-					<ul>
-					{% for termOn in facetOn.allterms %}
-					<li>&middot;&nbsp;<a href='/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:&quot;{{termOn.term}}&quot;'>
-					{{termOn.term}}
-					</a> ({{termOn.count}})</li>
-					{% endfor %}
-					</ul>
-		</div>
-		{% endif %}
-	{% endifequal %}
-{% endfor %} 
-</div>
-
-{% for facetOn in facets %}
-
-	{% ifequal facetOn.name 'Topic' %}
-	{% if not limit %}
-	<div class="bluebox">
-		<strong>{% trans "Were You Searching For This Topic?" %}</strong><br />
-				
-					<ul>
-					{% for termOn in facetOn.terms %}
-						
-						<li>&middot;&nbsp;<a href='/search/?q=%22{{termOn.term}}%22&index={{facetOn.code}}&limit='>
-							{{termOn.term}}
-						</a></li>
-					{% endfor %}
-					
-					</ul>
-					{% if facetOn.has_more %}
-					<ul>
-						<span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
-							{% for termOn in facetOn.extended_terms %}
-								<li>&middot;&nbsp;<a href='/search/?q=%22{{termOn.term}}%22&index={{facetOn.code}}&limit='>
-									{{termOn.term}}
-								</a></li>
-							{% endfor %}
-						</span>
-					{% endif %}
-					</ul>
-				{% if facetOn.has_more %}
-					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">{% trans "Show More..." %}</a>
-					<a href="#" id="showfewer-{{facetOn.code}}" style="display: none" onclick="showFewer('{{facetOn.code}}');">{% trans "Show Fewer..." %}</a>
-					
-				{% endif %}
-				{% endif %}
-				
-				
-
-	{% endifequal %}
-{% endfor %}
-	
-	
-</div>
-
-<div class="facets">
-	{% if removeLimits %}
-		<strong>{% trans "Expand Results:" %}</strong><br />
-			<div class="remove-facet-list">
-				<ul> 
-				{% for limitOn in removeLimits %}
-					<li>
-						&middot;&nbsp;<a href='/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{limitOn.new_limit}}'>Remove {{limitOn.label}}</a>
-					</li>
-				{% endfor %}
-				</ul>
-			</div>
-		<br />
-	{% endif %} 
-	 
-	
-	{% for facetOn in facets %}
-		{% ifequal facetOn.facetlocation 'sidebar' %}
-		{% if facetOn.terms %}
-			<div class="facet-list" id="facet-list-{{facetOn.code}}">
-				<strong>{{facetOn.name}}</strong>
-					<ul>
-					{% for termOn in facetOn.terms %}
-						<li>&middot;&nbsp;<a href='/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:&quot;{{termOn.term}}&quot;'>
-							{{termOn.term}}
-						</a> ({{termOn.count}})</li>
-					{% endfor %}
-					{% if facetOn.has_more %}
-						<span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
-							{% for termOn in facetOn.extended_terms %}
-								<li>&middot;&nbsp;<a href='/search/?q={{q}}&index={{currentIndex}}&sort={{currentSort}}&limit={{currentLimit}}{% if currentLimit %},,{% endif %}{{facetOn.code}}:&quot;{{termOn.term}}&quot;'>
-									{{termOn.term}}
-								</a> ({{termOn.count}})</li>
-							{% endfor %}
-						</span>
-					{% endif %}
-					</ul>
-				{% if facetOn.has_more %}
-					<a href="#" id="showmore-{{facetOn.code}}" onclick="showMore('{{facetOn.code}}');">{% trans "Show More..." %}</a>
-					<a href="#" id="showfewer-{{facetOn.code}}" style="display: none" onclick="showFewer('{{facetOn.code}}');">{% trans "Show Fewer..." %}</a>
-					
-				{% endif %}
-			</div>
-		{% endif %}
-		{% endifequal %}
-	{% endfor %}
-</div>
-<div class="results">
-	{% comment %}{% if pagination.hasPrevious or pagination.hasNext %}
-	<div class="prev-next-top">
-		{% if pagination.hasPrevious %}
-			<span class="page-num"><a href='/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;{% trans "Previous" %}</a></span>
-		{% endif %}		
-		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>{% trans "Next" %}&nbsp;&raquo;</a></span>
-		{% endif %}	
-	</div>
-	{% endif %}
-	{% endcomment %}
-{% for docOn in response.docs %}
-<table class="record">
-
-	<tr>
-	<td>{{docOn.count}}.</td>
-	<td width="10%">
-		    {% if docOn.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{docOn.isbn_numeric}}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
-	</td>
-	<td align="left" width="80%">
-		<div class="title"><a href="{{docOn.full_bib_url}}">{{docOn.title}}</a></div>
-		<div class="author">
-			{% if docOn.author %}
-				{%trans "by" %} {% for authorOn in docOn.author %}<a href='/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %}; {% endif %}{% endfor %}
-			{% endif %}
-		</div>
-		<div class="publisher">
-			<a href='/search/?q={{docOn.publisher}}&index=publisher'>{{docOn.publisher}}</a> 
-			{%if docOn.pubdate %}: {% endif %}<a href='/search/?q={{docOn.pubdate}}&index=pubdate'>{{docOn.pubdate}}</a> 
-		</div>
-		<div class="callnum">
-			{%if docOn.LCClass %}
-				{%for LCNum in docOn.LCClass %}{% trans "Call number: " %}{{LCNum}}{% if not forloop.last %},{% endif %}{% endfor %}
-			{% endif %}
-			{%if docOn.DeweyClass %}
-				{%for DeweyNum in docOn.DeweyClass %}{% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %},{% endif %}{% endfor %}
-			{% endif %}
-			{{callnum}}
-		</div>
-		{% if docOn.url %}
-			{%for url in docOn.url %}
-		<div class="url">
-			<a href="{{url}}">{% trans "Online resource" %}</a>
-		</div>
-			{% endfor %}
-		{% endif %}
-		
-		{% if docOn.SSurldetails %}
-		<div class="Journallinks">
-		<ul>
-			{% for SSurls in docOn.SSurldetails %}
-			
-				<li><font color="#FF0000">{%trans "Find it here" %} -></font><a href='{% for tmp in SSurls %}{% ifequal forloop.counter0 0 %}{{tmp}}'>{% endifequal %}{% ifequal forloop.counter0 1 %}{{tmp}}</a>{% endifequal %}{% ifequal forloop.counter0 2 %} from {{tmp}}{% endifequal %}{% ifequal forloop.counter0 3 %} to {{tmp}}{% endifequal %}{% endfor %}</li>
-			{% endfor %}
-		</ul>
-		</div>
-		{% endif %}		
-		
-	</td>
-	<td align="right">
-		{% ifequal docOn.availability 'Available' %}<font color="#009900">{{docOn.availability}}</font>{% endifequal %}
-		{% ifequal docOn.availability 'Unavailable' %}<font color="#FF0000">{{docOn.availability}}</font>{% endifequal %}
-	
-	</td>
-	<td align="right">{{ docOn.format_icon_url }}</td>
-	</tr>
-	
-</table>
-{% endfor %}
-</div>
-{% if pagination.hasPrevious or pagination.hasNext %}
-<br clear="all" />
-<div class="pagination">
-		{% if pagination.hasPrevious %}
-			<span class="page-num"><a href='/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;{% trans "Previous" %}</a></span>
-		{% endif %}	
-		{% for pageOn in pagination.pages %}
-			{% if pageOn.selected %}
-				<span class="selected page-num">{{pageOn.pageLabel}}</span>
-			{% else %}
-				<span class="page-num"><a href='/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pageOn.page}}' title="results {{pageOn.start}} to {{pageOn.end}}">{{pageOn.pageLabel}}</a></span>
-			{% endif %}
-		{% endfor %}
-		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/search/?q={{q}}&index={{currentIndex}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>{% trans "Next" %}&nbsp;&raquo;</a></span>
-		{% endif %}	
-</div>
-{% endif %}
+{% extends "base.html" %}
+{% block title %}{% blocktrans %}Helios Search on {{ q }}{% endblocktrans %}{% endblock %}
+{% block body %}
+  <div class="searchform">
+    <form name="s">
+      <span class="logo"><a href="{{ BASE_URL }}">Helios</a></span> 
+      <input type="text" id="id_q" name="q" maxlength="40" value="{{ q }}" />
+      <select name="index" id="id_index"> 
+        {% for indexOn in indexes %}
+          <option value="{{ indexOn.index }}"{% ifequal indexOn.index currentIndex %} selected="true"{% endifequal %}>{{ indexOn.name }}</option>
+        {% endfor %}
+      </select>
+      <input type="submit" value={% trans "Search" %} class="searchbutton" />
+    </form>
+  </div>
+  <div class="topbar">
+    <table width="100%">
+      <tr>
+        <td>
+          {% blocktrans with response.numFound as numFound %}
+            Results <strong>{{ startNum }}-{{ endNum }}</strong> of&nbsp;&nbsp;<strong>{{numFound}}</strong> for {{ q }} ({{ response_time }} seconds)
+          {% endblocktrans %}
+        </td>
+        <td align="right" valign="center">
+          <form name="sortForm" accept-charset="utf-8">
+            <strong>{% trans "Sort by:" %}</strong>
+            <select name="sortField" onchange="doSort()">
+              <option value="?q={{ q }}&index={{ currentIndex }}&limit={{ currentLimit }}">{% trans "Relevance" %}</option>
+              {% for sortOn in sorts %}
+                <option{% if sortOn.selected %} selected="true"{% endif %} value="?q={{ q }}&index={{ currentIndex }}&limit={{ currentLimit }}&sort={{ sortOn.field }}%20{{ sortOn.direction }}">{{ sortOn.name }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </td>
+      </tr>
+    </table>	
+  </div>
+  {% for facetOn in facets %}
+    {% ifequal facetOn.facetlocation "topbar" %}
+      <div class="topbarfacets">
+        {% if facetOn.terms %}
+          <div class="facet-list" id="facet-list-{{ facetOn.code }}">
+            <strong>{{ facetOn.name }}</strong>
+              <ul>
+              {% for termOn in facetOn.allterms %}
+                <li>&middot;&nbsp;<a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&sort={{ currentSort }}&limit={{ currentLimit }}{% if currentLimit %},,{% endif %}{{ facetOn.code }}:&quot;{{ termOn.term }}&quot;">{{ termOn.term}}</a> ({{ termOn.count }})</li>
+              {% endfor %}
+              </ul>
+          </div>
+        {% endif %}
+      </div>
+    {% endifequal %}
+  {% endfor %} 
+  {% for facetOn in facets %}
+    {% ifequal facetOn.name "Topic" %}
+      {% if not limit %}
+        <div class="bluebox">
+          <strong>{% trans "Were You Searching For This Topic?" %}</strong><br />
+          <ul>
+            {% for termOn in facetOn.terms %}
+              <li>&middot;&nbsp;<a href="{{ BASE_URL }}search/?q=%22{{ termOn.term }}%22&index={{ facetOn.code }}&limit=">{{ termOn.term }}</a></li>
+            {% endfor %}
+          </ul>
+          {% if facetOn.has_more %}
+            <ul>
+              <span style="display:none;" id="facet-list-ext-{{ facetOn.code }}">
+                {% for termOn in facetOn.extended_terms %}
+                  <li>&middot;&nbsp;<a href="{{ BASE_URL }}search/?q=%22{{ termOn.term }}%22&index={{ facetOn.code }}&limit=">{{ termOn.term }}</a></li>
+                {% endfor %}
+              </span>
+            </ul>
+          {% endif %}
+          {% if facetOn.has_more %}
+            <a href="#" id="showmore-{{ facetOn.code }}" onclick="showMore("{{ facetOn.code }}");">{% trans "Show More..." %}</a>
+            <a href="#" id="showfewer-{{ facetOn.code }}" style="display: none" onclick="showFewer('{{ facetOn.code }}');">{% trans "Show Fewer..." %}</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endifequal %}
+  {% endfor %}
+  <div class="facets">
+    {% if removeLimits %}
+      <strong>{% trans "Expand Results:" %}</strong><br />
+      <div class="remove-facet-list">
+        <ul> 
+          {% for limitOn in removeLimits %}
+          <li>&middot;&nbsp;<a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&sort={{ currentSort }}&limit={{ limitOn.new_limit }}">Remove {{ limitOn.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <br />
+    {% endif %} 
+    {% for facetOn in facets %}
+      {% ifequal facetOn.facetlocation "sidebar" %}
+        {% if facetOn.terms %}
+          <div class="facet-list" id="facet-list-{{ facetOn.code }}">
+            <strong>{{ facetOn.name }}</strong>
+            <ul>
+              {% for termOn in facetOn.terms %}
+                <li>&middot;&nbsp;<a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&sort={{ currentSort }}&limit={{ currentLimit }}{% if currentLimit %},,{% endif %}{{ facetOn.code }}:&quot;{{ termOn.term }}&quot;">{{ termOn.term }}</a> ({{ termOn.count }})</li>
+              {% endfor %}
+              {% if facetOn.has_more %}
+                <span style="display:none;" id="facet-list-ext-{{facetOn.code}}">
+                  {% for termOn in facetOn.extended_terms %}
+                    <li>&middot;&nbsp;<a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&sort={{ currentSort }}&limit={{ currentLimit }}{% if currentLimit %},,{% endif %}{{ facetOn.code }}:&quot;{{ termOn.term }}&quot;">{{ termOn.term }}</a> ({{ termOn.count }})</li>
+                  {% endfor %}
+                </span>
+              {% endif %}
+            </ul>
+            {% if facetOn.has_more %}
+              <a href="#" id="showmore-{{ facetOn.code }}" onclick="showMore('{{ facetOn.code }}');">{% trans "Show More..." %}</a>
+              <a href="#" id="showfewer-{{ facetOn.code }}" style="display: none" onclick="showFewer('{{ facetOn.code }}');">{% trans "Show Fewer..." %}</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endifequal %}
+    {% endfor %}
+  </div>
+  <div class="results">
+    {% comment %}
+      {% if pagination.hasPrevious or pagination.hasNext %}
+      <div class="prev-next-top">
+        {% if pagination.hasPrevious %}
+          <span class="page-num"><a href="{{ BASE_URL }}search/?q={{ q }}&limit={{ currentLimit }}&sort={{ currentSort }}&page={{ pagination.previousPage }}">&laquo;&nbsp;{% trans "Previous" %}</a></span>
+        {% endif %}		
+        {% if pagination.hasNext %}
+          <span class="page-num"><a href="{{ BASE_URL }}search/?q={{ q }}&limit={{ currentLimit }}&sort={{ currentSort }}&page={{ pagination.nextPage }}">{% trans "Next" %}&nbsp;&raquo;</a></span>
+        {% endif %}	
+      </div>
+      {% endif %}
+    {% endcomment %}
+    {% for docOn in response.docs %}
+      <table class="record">
+        <tr>
+          <td>{{ docOn.count }}.</td>
+          <td width="10%">
+            {% if docOn.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{ docOn.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
+          </td>
+          <td align="left" width="80%">
+            <div class="title">
+              <a href="{{ docOn.full_bib_url }}">{{ docOn.title }}</a>
+            </div>
+            <div class="author">
+              {% if docOn.author %}
+                {%trans "by" %}
+                {% for authorOn in docOn.author %}
+                  <a href="{{ BASE_URL }}search/?q={{ authorOn }}&index=author">{{ authorOn }}</a>{% if not forloop.last %}; {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
+            <div class="publisher">
+              <a href="{{ BASE_URL }}search/?q={{ docOn.publisher }}&index=publisher">{{ docOn.publisher }}</a> 
+              {%if docOn.pubdate %}(<a href="{{ BASE_URL }}search/?q={{ docOn.pubdate }}&index=pubdate">{{ docOn.pubdate }}</a>){% endif %}
+            </div>
+            <div class="callnum">
+              {%if docOn.LCClass %}
+                {%for LCNum in docOn.LCClass %}
+                  {% trans "Call number: " %}{{ LCNum }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% endif %}
+              {%if docOn.DeweyClass %}
+                {%for DeweyNum in docOn.DeweyClass %}
+                  {% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% endif %}
+              {{ callnum }}
+            </div>
+            {% if docOn.url %}
+              {%for url in docOn.url %}
+                <div class="url">
+                  <a href="{{ url }}">{% trans "Online resource" %}</a>
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% if docOn.SSurldetails %}
+              <div class="Journallinks">
+                <ul>
+                  {% for SSurls in docOn.SSurldetails %}
+                    <li>
+                      <span class="findit">{%trans "Find it here" %}</span> -&gt; 
+                      {% for tmp in SSurls %}
+                        <a href="{{ tmp }}">{{ tmp }}</a>
+                      {% endfor %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}		
+          </td>
+          <td align="right">
+            {% ifequal docOn.availability "Available" %}<span class="available">{{ docOn.availability }}</span>{% endifequal %}
+            {% ifequal docOn.availability "Unavailable" %}<span class="unavailable">{{ docOn.availability }}</span>{% endifequal %}
+          </td>
+          <td align="right">{{ docOn.format_icon_url }}</td>
+        </tr>
+      </table>
+    {% endfor %}
+  </div>
+  {% if pagination.hasPrevious or pagination.hasNext %}
+    <br clear="all" />
+    <div class="pagination">
+      {% if pagination.hasPrevious %}
+        <span class="page-num"><a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&limit={{ currentLimit }}&sort={{ currentSort }}&page={{ pagination.previousPage }}">&laquo;&nbsp;{% trans "Previous" %}</a></span>
+      {% endif %}	
+      {% for pageOn in pagination.pages %}
+        {% if pageOn.selected %}
+          <span class="selected page-num">{{ pageOn.pageLabel }}</span>
+        {% else %}
+          <span class="page-num"><a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&limit={{ currentLimit }}&sort={{ currentSort }}&page={{ pageOn.page }}" title="results {{ pageOn.start }} to {{ pageOn.end }}">{{ pageOn.pageLabel }}</a></span>
+        {% endif %}
+      {% endfor %}
+      {% if pagination.hasNext %}
+        <span class="page-num"><a href="{{ BASE_URL }}search/?q={{ q }}&index={{ currentIndex }}&limit={{ currentLimit }}&sort={{ currentSort }}&page={{ pagination.nextPage }}">{% trans "Next" %}&nbsp;&raquo;</a></span>
+      {% endif %}	
+    </div>
+  {% endif %}
 {% endblock %}

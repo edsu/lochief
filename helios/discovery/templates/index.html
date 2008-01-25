@@ -17,29 +17,25 @@
   You should have received a copy of the GNU General Public License
   along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
+{% extends "base.html" %}
 {% load i18n %}
-<html>
-<link href="/media/001/001.css" type="text/css" rel="stylesheet" media="screen" />
-  <head>
-    <title>{% block title %}{% trans "Helios" %}{% endblock %}</title>
-    {% if searchstring %}
+{% block head %}
+  {% if searchstring %}
     <link rel="alternate" type="application/atom+xml" href="/catalog/feed/atom/?{{get}}" />
     <link rel="alternate" type="application/rss+xml" href="/catalog/feed/rss/?{{get}}" />
-    {% endif %}
-    <script src="/media/js/base.js">
-    </script>
-  </head>
-  <body {% block bodyonload %}onload="setFocus();"{% endblock %}>
-  {% block body %}
+  {% endif %}
+  <script type="text/javascript">
+    window.onload = setFocus;
+  </script>
+{% endblock %}
+{% block body %}
   <div class="searchpage">
     <span class="logo">Helios</span>
-    <form name="s" method="GET" action = "/search/">
+    <form name="s" action = "{{ BASE_URL }}search/">
       <p>
         <label for="id_term">Search keywords:</label> <input type="text" id="id_term" name="q" size="20" maxlength="40" value="" />
-        <input type="submit" value={%trans "Search" %} class="searchbutton" />		
+        <input type="submit" value={% trans "Search" %} class="searchbutton" />		
       </p>
     </form>
   </div>
-  {% endblock %}
-  </body>
-</html>
+{% endblock %}

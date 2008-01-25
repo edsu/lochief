@@ -17,148 +17,135 @@
   along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 {% load i18n %}
-{% extends "index.html" %}
+{% extends "base.html" %}
 {% block title %}{% blocktrans %}Helios Search on {{q}}{% endblocktrans %}{% endblock %}
 {% block body %}
-		<div class="searchform">
-		<form name="s" method="GET" action="/search">
-			<span class="logo"><a href="/">Helios</a></span> 
-			<input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
-			<select name="index" id="id_index"> 
-				{% for indexOn in indexes %}
-					<option value="{{indexOn.index}}" {% ifequal indexOn.index 'text'%}selected="true"{% endifequal %}>{{indexOn.name}}</option>
-				{% endfor %}
-			</select>
-			<input type="submit" value={%trans "Search" %} class="searchbutton" />		
-		</form>
-		</div>
-
-
-<div class="results">
-	{% comment %}{% if pagination.hasPrevious or pagination.hasNext %}
-	<div class="prev-next-top">
-		{% if pagination.hasPrevious %}
-			<span class="page-num"><a href='/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.previousPage}}'>&laquo;&nbsp;Previous</a></span>
-		{% endif %}		
-		{% if pagination.hasNext %}
-			<span class="page-num"><a href='/search/?q={{q}}&limit={{currentLimit}}&sort={{currentSort}}&page={{pagination.nextPage}}'>{% trans "Next" %}&nbsp;&raquo;</a></span>
-		{% endif %}	
-	</div>
-	{% endif %}
-	{% endcomment %}
-{% for docOn in response.docs %}
-<table class="record">
-	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Author: " %}</strong></td>
-		<td valign=top class="text" >
-			<div class="author">
-			{% if docOn.author %}
-				{% for authorOn in docOn.author %}<a href='/search/?q={{authorOn}}&index=author'>{{authorOn}}</a>{% if not forloop.last %},{% endif %}{% endfor %}
-			{% endif %}
-			</div>
-		</td>
-	</tr>
-	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Title:" %}</strong></td>
-		<td valign=top class="text" >
-			<div class="title">
-			{{docOn.title}}
-			</div>
-		</td>
-	</tr>
-	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Publisher:" %}</strong></td>
-		<td valign=top class="text" >
-			<div class="publisher">
-			{{docOn.publisher}} {%if docOn.pubdate %}{{docOn.pubdate}}</a> {% endif %}
-			</div>
-		</td>
-	</tr>
-	
-	{% if docOn.isbn_numeric %}
-	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{%trans "ISBN:" %}</strong></td>
-		<td valign=top class="text" >
-			<div class="isbn">
-			{% if docOn.isbn_numeric %}{{docOn.isbn_numeric}}{% endif %}
-			</div>
-		</td>
-	</tr>
-	{% endif %}
-	
-	{% if docOn.issn %}
-	<tr>
-		<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "ISSN:" %}</strong></td>
-		<td valign=top class="text" >
-			<div class="isbn">
-			{% if docOn.issn %}{{docOn.issn}}{% endif %}
-			</div>
-		</td>
-	</tr>
-	{% endif %}
-	
-	{% if docOn.subject %}
-		{% for topicTerms in docOn.subject %}
-			
-				<tr>
-					<td valign=top class="text" bgcolor="lightgrey" align="right" width="20%"><STRONG>{% trans "Subject:" %}</strong></td>
-					<td valign=top class="text" >
-						<div class="topic">
-							<a href='/search/?q="{{topicTerms}}"&index=subject'>{{topicTerms}}</a> 
-						</div>
-					</td>
-				</tr>
-		{% endfor %}
-	{% endif %}
-	
-	{% if docOn.copyinfo %}
-		
-		
-		<table border="1" cellspacing="0">
-			<tr bgcolor="#FFFFCC">
-				<td width="20">{% trans "Copy" %}</td>
-				<td width="100">{% trans "Call Number" %}</td>
-				<td width="220">{% trans "Location" %}</td>
-				<td width="60">{% trans "Material" %}</td>
-				<td width="100">{% trans "Status" %}</td>
-			</tr>
-			{% for copies in docOn.copydetails %}
-			<tr>
-				<td>{% for tmp in copies %}{% ifequal forloop.counter0 0 %}{{tmp}}{% endifequal %}{% endfor %}</td>
-				<td>{% for tmp in copies %}{% ifequal forloop.counter0 1 %}{{tmp}}{% endifequal %}{% endfor %}</td>
-				<td>{% for tmp in copies %}{% ifequal forloop.counter0 2 %}{{tmp}}{% endifequal %}{% endfor %}</td> 
-				<td>{% for tmp in copies %}{% ifequal forloop.counter0 3 %}{{tmp}}{% endifequal %}{% endfor %}</td> 
-				<td>{% for tmp in copies %}
-										{% ifequal forloop.counter0 4 %}
-											{% ifequal tmp 'Available' %}<font color="#009900">{{tmp}}</font>{% endifequal %}
-											{% ifequal tmp "Unavailable" %}<font color="#FF0000">{{tmp}}</font>{% endifequal %}
-										{% endifequal %}{% endfor %}</td> 
-			</tr>
-			{% endfor %}
-		</table>
-		
-		
-	{% endif %}
-	
-	{% if docOn.SSurldetails %}
-		
-		
-		<table border="1" cellspacing="0">
-			<tr bgcolor="#FFFFCC">
-				<td width="300">{% trans "Database" %}</td>
-				<td width="60">{% trans "Available from" %}</td>
-				<td width="100">{% trans "Available to" %}</td>
-			</tr>
-			{% for SSurls in docOn.SSurldetails %}
-			<tr>
-				<td><a href='{% for tmp in SSurls %}{% ifequal forloop.counter0 0 %}{{tmp}}'>{% endifequal %}{% ifequal forloop.counter0 1 %}{{tmp}}{% endifequal %}{% endfor %}</a></td>
-				<td>{% for tmp in SSurls %}{% ifequal forloop.counter0 2 %}{{tmp}}{% endifequal %}{% endfor %}</td>
-				<td>{% for tmp in SSurls %}{% ifequal forloop.counter0 3 %}{{tmp}}{% endifequal %}{% endfor %}</td> 
-			</tr>
-			{% endfor %}
-		</table>
-		
-	{% endif %}
-
-{% endfor %}
+  <div class="searchform">
+    <form name="s" action="{{ BASE_URL }}search">
+      <span class="logo"><a href="{{ BASE_URL }}">Helios</a></span> 
+      <input type="text" id="id_q" name="q" size="20" maxlength="40" value="{{q}}" />
+      <select name="index" id="id_index"> 
+        {% for indexOn in indexes %}
+          <option value="{{indexOn.index}}" {% ifequal indexOn.index 'text'%}selected="true"{% endifequal %}>{{indexOn.name}}</option>
+        {% endfor %}
+      </select>
+      <input type="submit" value={%trans "Search" %} class="searchbutton" />		
+    </form>
+  </div>
+  <div class="results">
+  {% for docOn in response.docs %}
+    <table class="record">
+      <tr>
+        <td valign=top class="text" bgcolor="lightgrey" align="right" width="20%">
+          <strong>{% trans "Author: " %}</strong>
+        </td>
+        <td valign=top class="text" >
+          <div class="author">
+            {% if docOn.author %}
+              {% for authorOn in docOn.author %}<a href='{{ BASE_URL }}search/?q={{ authorOn }}&index=author'>{{ authorOn }}</a>{% if not forloop.last %},{% endif %}{% endfor %}
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td valign=top class="text" bgcolor="lightgrey" align="right" width="20%">
+          <strong>{% trans "Title:" %}</strong>
+        </td>
+        <td valign=top class="text" >
+          <div class="title">
+            {{docOn.title}}
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td valign=top class="text" bgcolor="lightgrey" align="right" width="20%">
+          <strong>{% trans "Publisher:" %}</strong>
+        </td>
+        <td valign=top class="text" >
+          <div class="publisher">
+            {{docOn.publisher}} {%if docOn.pubdate %}{{docOn.pubdate}}</a> {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% if docOn.isbn_numeric %}
+        <tr>
+          <td valign=top class="text" bgcolor="lightgrey" align="right" width="20%">
+            <strong>{%trans "ISBN:" %}</strong>
+          </td>
+          <td valign=top class="text" >
+            <div class="isbn">
+              {% if docOn.isbn_numeric %}{{ docOn.isbn_numeric }}{% endif %}
+            </div>
+          </td>
+        </tr>
+      {% endif %}
+      {% if docOn.issn %}
+        <tr>
+          <td valign=top class="text" bgcolor="lightgrey" align="right" width="20%">
+            <strong>{% trans "ISSN:" %}</strong>
+          </td>
+          <td valign=top class="text" >
+            <div class="isbn">
+              {% if docOn.issn %}{{ docOn.issn }}{% endif %}
+            </div>
+          </td>
+        </tr>
+      {% endif %}
+      {% if docOn.subject %}
+        {% for topicTerms in docOn.subject %}
+          <tr>
+            <td valign=top class="text" bgcolor="lightgrey" align="right" width="20%">
+              <strong>{% trans "Subject:" %}</strong>
+            </td>
+            <td valign=top class="text" >
+              <div class="topic">
+                <a href='{{ BASE_URL }}search/?q="{{ topicTerms }}"&index=subject'>{{ topicTerms }}</a> 
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+      {% if docOn.copyinfo %}
+        <table border="1" cellspacing="0">
+          <tr bgcolor="#FFFFCC">
+            <td width="20">{% trans "Copy" %}</td>
+            <td width="100">{% trans "Call Number" %}</td>
+            <td width="220">{% trans "Location" %}</td>
+            <td width="60">{% trans "Material" %}</td>
+            <td width="100">{% trans "Status" %}</td>
+          </tr>
+          {% for copies in docOn.copydetails %}
+            <tr>
+              <td>{% for tmp in copies %}{% ifequal forloop.counter0 0 %}{{ tmp }}{% endifequal %}{% endfor %}</td>
+              <td>{% for tmp in copies %}{% ifequal forloop.counter0 1 %}{{ tmp }}{% endifequal %}{% endfor %}</td>
+              <td>{% for tmp in copies %}{% ifequal forloop.counter0 2 %}{{ tmp }}{% endifequal %}{% endfor %}</td> 
+              <td>{% for tmp in copies %}{% ifequal forloop.counter0 3 %}{{ tmp }}{% endifequal %}{% endfor %}</td> 
+              <td>{% for tmp in copies %}
+              {% ifequal forloop.counter0 4 %}
+                {% ifequal tmp 'Available' %}<font color="#009900">{{ tmp }}</font>{% endifequal %}
+                {% ifequal tmp "Unavailable" %}<font color="#FF0000">{{ tmp }}</font>{% endifequal %}
+              {% endifequal %}{% endfor %}</td> 
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+      {% if docOn.SSurldetails %}
+        <table border="1" cellspacing="0">
+          <tr bgcolor="#FFFFCC">
+            <td width="300">{% trans "Database" %}</td>
+            <td width="60">{% trans "Available from" %}</td>
+            <td width="100">{% trans "Available to" %}</td>
+          </tr>
+          {% for SSurls in docOn.SSurldetails %}
+            <tr>
+              <td><a href='{% for tmp in SSurls %}{% ifequal forloop.counter0 0 %}{{tmp}}'>{% endifequal %}{% ifequal forloop.counter0 1 %}{{tmp}}{% endifequal %}{% endfor %}</a></td>
+              <td>{% for tmp in SSurls %}{% ifequal forloop.counter0 2 %}{{ tmp }}{% endifequal %}{% endfor %}</td>
+              <td>{% for tmp in SSurls %}{% ifequal forloop.counter0 3 %}{{ tmp }}{% endifequal %}{% endfor %}</td> 
+            </tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    </table>
+  {% endfor %}
+</div>
 {% endblock %}

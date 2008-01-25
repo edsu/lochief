@@ -23,8 +23,11 @@ import os
 DEBUG= True
 TEMPLATE_DEBUG = DEBUG
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_URL = ''
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) + '/'
+
+# Base URL of the project, either absolute or relative.  
+# Must include a trailing slash.
+BASE_URL = '/'
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -32,7 +35,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = BASE_DIR + '/fbo.db'             # Or path to database file if using sqlite3.
+DATABASE_NAME = BASE_DIR + 'fbo.db'             # Or path to database file if using sqlite3.
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
@@ -65,12 +68,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = BASE_DIR + '/media/'
+MEDIA_ROOT = BASE_DIR + 'media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = BASE_URL + '/media/'
+MEDIA_URL = BASE_URL + 'media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -98,7 +101,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'helios.urls'
 
 TEMPLATE_DIRS = (
-    BASE_DIR + '/tempates/',
+    BASE_DIR + 'templates/',
 )
 
 INSTALLED_APPS = (
@@ -114,4 +117,3 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'helios.context_processors.base_url',
 )
-
