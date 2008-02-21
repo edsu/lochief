@@ -136,7 +136,7 @@ def getsearchresults(request):
         if LOCAL_ITEM_DISPLAY == 1:
              # use the local facbackopac view   
             if record.has_key('bib_num'):
-                record['full_bib_url'] = '/catalog/?q=%s&index=bib_num' % ('%22' + record['bib_num'] + '%22')
+                record['full_bib_url'] = settings.BASE_URL + 'catalog/?q=%s&index=bib_num' % ('%22' + record['bib_num'] + '%22')
                 # Add the media format icons
                 if record.has_key('format'):
                     formatIconURL = FORMAT_ICONS.get( record['format'], None)
