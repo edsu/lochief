@@ -30,6 +30,7 @@ from django.utils.http import urlquote
 from django.core.cache import cache
 from django.template import RequestContext
 
+from helios import settings
 from config import ITEMS_PER_PAGE, FACETS, SOLR_SERVER, MAX_FACET_TERMS_EXPANDED, SEARCH_CACHE_TIME, MAX_FACET_TERMS_BASIC, SEARCH_INDEXES, SORTS, LOCAL_LOGO_LOCATION, LOCAL_INSTITUTION_NAME, LOCAL_ITEM_DISPLAY, FORMAT_ICONS
 
 facetCodes = [ f['code'] for f in FACETS ]
@@ -50,8 +51,9 @@ def search(request):
         return HttpResponseRedirect("/")
     context['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
     context['LOCAL_INSTITUTION_NAME'] = LOCAL_INSTITUTION_NAME
+    context['ILS'] = settings.ILS
+
     # render using appropriate
-    
     if context['format'] and context['format'] == "py": 
         resp = HttpResponse( pprint.pformat(context) )
         resp.headers['Content-Type'] = "text/plain" ; return resp
@@ -125,51 +127,49 @@ def getsearchresults(request):
     
     # augment item results.
     count = 0
-    for itemOn in context['response']['docs']:
-        itemOn['count'] = count + startNum
+    for record in context['response']['docs']:
+        record['count'] = count + startNum
         count += 1
         
         #call number display
 
         if LOCAL_ITEM_DISPLAY == 1:
              # use the local facbackopac view   
-            if itemOn.has_key('bib_num'):
-                itemOn['full_bib_url'] = '/catalog/?q=%s&index=bib_num' % ('%22' + itemOn['bib_num'] + '%22')
+            if record.has_key('bib_num'):
+                record['full_bib_url'] = '/catalog/?q=%s&index=bib_num' % ('%22' + record['bib_num'] + '%22')
                 # Add the media format icons
-                if itemOn.has_key('format'):
-                    formatIconURL = FORMAT_ICONS.get( itemOn['format'], None)
-                    if formatIconURL: itemOn['format_icon_url'] = formatIconURL
+                if record.has_key('format'):
+                    formatIconURL = FORMAT_ICONS.get( record['format'], None)
+                    if formatIconURL: record['format_icon_url'] = formatIconURL
         else:
             # Every item that we export, by definition, has a bib_num... but the
             # field might not be indexed in the proprietary ILS
 
             # {ckey} is the field to search for the catalog key in Unicorn
             ckey = re.compile('\s(.*)$')
-            bib_num = ckey.search(itemOn['bib_num']).group(1)
-            itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (bib_num, "ckey")
+            bib_num = ckey.search(record['bib_num']).group(1)
+            record['full_bib_url'] = OPAC_FULL_BIB_URL % (bib_num, "ckey")
 
             # Another ILS may have to use a different field, such as the ones below
             # Uncomment the one(s) that works for your ILS
-            # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['isbn_numeric'], "020")
+            # record['full_bib_url'] = OPAC_FULL_BIB_URL % (record['isbn_numeric'], "020")
 
-            #if itemOn.has_key('ctrl_num'):
-            # itemOn['full_bib_url'] = OPAC_FULL_BIB_URL % (itemOn['ctrl_num'], "001")
+            #if record.has_key('ctrl_num'):
+            # record['full_bib_url'] = OPAC_FULL_BIB_URL % (record['ctrl_num'], "001")
             
             # Add the media format icons
-            if itemOn.has_key('format'):
-                    formatIconURL = FORMAT_ICONS.get( itemOn['format'], None)
-                    if formatIconURL: itemOn['format_icon_url'] = formatIconURL
+            if record.has_key('format'):
+                    formatIconURL = FORMAT_ICONS.get( record['format'], None)
+                    if formatIconURL: record['format_icon_url'] = formatIconURL
         #needed for amazon book covers and isbn to be displayable
-        if itemOn.has_key('isbn'):
-            itemOn['isbn_numeric'] = ''.join( [ x for x in itemOn['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
+        if record.has_key('isbn'):
+            record['isbn_numeric'] = ''.join( [ x for x in record['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
         #make an array out of Serials Solutions Name and URL
-        if itemOn.has_key('SSdata'):
-            itemOn['SSurldetails']=[]
-            for items in itemOn['SSdata']:
+        if record.has_key('SSdata'):
+            record['SSurldetails']=[]
+            for items in record['SSdata']:
                 SSurlitemdetails=items.split('|')
-                itemOn['SSurldetails'].append(SSurlitemdetails)
-                
-
+                record['SSurldetails'].append(SSurlitemdetails)
             
     # re-majigger facets 
     facetCounts = context['facet_counts']

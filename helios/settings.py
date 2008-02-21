@@ -117,3 +117,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'helios.context_processors.base_url',
 )
+
+## settings specific to this project (that is, non-Django)
+
+# "III" is the only choice right now
+ILS = ''

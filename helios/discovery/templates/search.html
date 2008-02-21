@@ -20,6 +20,11 @@
 {% endcomment %}
 {% load i18n %}
 {% block title %}{% blocktrans %}Helios Search on {{ q }}{% endblocktrans %}{% endblock %}
+{% block head %}
+  {% ifequal ILS "III" %}
+    <script type="text/javascript" src="http://innoserv.library.drexel.edu/screens/majax.js"></script>
+  {% endifequal %}
+{% endblock %}
 {% block body %}
   <div class="searchform">
     <form name="s">
@@ -149,53 +154,53 @@
       </div>
       {% endif %}
     {% endcomment %}
-    {% for docOn in response.docs %}
+    {% for doc in response.docs %}
       <table class="record">
         <tr>
-          <td>{{ docOn.count }}.</td>
+          <td>{{ doc.count }}.</td>
           <td width="10%">
-            {% if docOn.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{ docOn.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
+            {% if doc.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
           </td>
           <td align="left" width="80%">
             <div class="title">
-              <a href="{{ docOn.full_bib_url }}">{{ docOn.title }}</a>
+              <a href="{{ doc.full_bib_url }}">{{ doc.title }}</a>
             </div>
             <div class="author">
-              {% if docOn.author %}
+              {% if doc.author %}
                 {%trans "by" %}
-                {% for authorOn in docOn.author %}
+                {% for authorOn in doc.author %}
                   <a href="{{ BASE_URL }}search/?q={{ authorOn }}&index=author">{{ authorOn }}</a>{% if not forloop.last %}; {% endif %}
                 {% endfor %}
               {% endif %}
             </div>
             <div class="publisher">
-              <a href="{{ BASE_URL }}search/?q={{ docOn.publisher }}&index=publisher">{{ docOn.publisher }}</a> 
-              {%if docOn.pubdate %}(<a href="{{ BASE_URL }}search/?q={{ docOn.pubdate }}&index=pubdate">{{ docOn.pubdate }}</a>){% endif %}
+              <a href="{{ BASE_URL }}search/?q={{ doc.publisher }}&index=publisher">{{ doc.publisher }}</a> 
+              {%if doc.pubdate %}(<a href="{{ BASE_URL }}search/?q={{ doc.pubdate }}&index=pubdate">{{ doc.pubdate }}</a>){% endif %}
             </div>
             <div class="callnum">
-              {%if docOn.LCClass %}
-                {%for LCNum in docOn.LCClass %}
+              {%if doc.LCClass %}
+                {%for LCNum in doc.LCClass %}
                   {% trans "Call number: " %}{{ LCNum }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
               {% endif %}
-              {%if docOn.DeweyClass %}
-                {%for DeweyNum in docOn.DeweyClass %}
+              {%if doc.DeweyClass %}
+                {%for DeweyNum in doc.DeweyClass %}
                   {% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
               {% endif %}
               {{ callnum }}
             </div>
-            {% if docOn.url %}
-              {%for url in docOn.url %}
+            {% if doc.url %}
+              {%for url in doc.url %}
                 <div class="url">
                   <a href="{{ url }}">{% trans "Online resource" %}</a>
                 </div>
               {% endfor %}
             {% endif %}
-            {% if docOn.SSurldetails %}
+            {% if doc.SSurldetails %}
               <div class="Journallinks">
                 <ul>
-                  {% for SSurls in docOn.SSurldetails %}
+                  {% for SSurls in doc.SSurldetails %}
                     <li>
                       <span class="findit">{%trans "Find it here" %}</span> -&gt; 
                       {% for tmp in SSurls %}
@@ -208,10 +213,13 @@
             {% endif %}		
           </td>
           <td align="right">
-            {% ifequal docOn.availability "Available" %}<span class="available">{{ docOn.availability }}</span>{% endifequal %}
-            {% ifequal docOn.availability "Unavailable" %}<span class="unavailable">{{ docOn.availability }}</span>{% endifequal %}
+            {% ifequal ILS "III" %}
+            <span class="majax-showholdings" title="i{{doc.isbn_numeric}}"></span>
+            {% endifequal %}
+            {% ifequal doc.availability "Available" %}<span class="available">{{ doc.availability }}</span>{% endifequal %}
+            {% ifequal doc.availability "Unavailable" %}<span class="unavailable">{{ doc.availability }}</span>{% endifequal %}
           </td>
-          <td align="right">{{ docOn.format_icon_url }}</td>
+          <td align="right">{{ doc.format_icon_url|safe }}</td>
         </tr>
       </table>
     {% endfor %}
