@@ -48,7 +48,7 @@ def search(request):
     start = time.time()
     context = getsearchresults(request)
     if context == None:
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(settings.BASE_URL)
     context['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
     context['LOCAL_INSTITUTION_NAME'] = LOCAL_INSTITUTION_NAME
     context['ILS'] = settings.ILS
