@@ -29,7 +29,7 @@
   <div class="searchform">
     <form name="s">
       <span class="logo"><a href="{{ BASE_URL }}">Helios</a></span> 
-      <input type="text" id="id_q" name="q" maxlength="40" value="{{ q }}" />
+      <input type="text" id="id_q" name="q" size="60"  maxlength="60" value="{{ q }}" />
       <select name="index" id="id_index"> 
         {% for indexOn in indexes %}
           <option value="{{ indexOn.index }}"{% ifequal indexOn.index currentIndex %} selected="true"{% endifequal %}>{{ indexOn.name }}</option>
