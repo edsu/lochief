@@ -26,9 +26,10 @@
   {% endifequal %}
 {% endblock %}
 {% block body %}
+<div class="topOverall">
   <div class="searchform">
     <form name="s">
-      <span class="logo"><a href="{{ BASE_URL }}">Helios</a></span> 
+      <span class="logo"><a href="{{ BASE_URL }}"><img src="/media/001/HeliosLogo.gif" /></a></span> 
       <input type="text" id="id_q" name="q" size="60"  maxlength="60" value="{{ q }}" />
       <select name="index" id="id_index"> 
         {% for indexOn in indexes %}
@@ -60,6 +61,7 @@
       </tr>
     </table>	
   </div>
+</div>
   {% for facetOn in facets %}
     {% ifequal facetOn.facetlocation "topbar" %}
       <div class="topbarfacets">
@@ -142,6 +144,7 @@
     {% endfor %}
   </div>
   <div class="results">
+    
     {% comment %}
       {% if pagination.hasPrevious or pagination.hasNext %}
       <div class="prev-next-top">
@@ -157,9 +160,12 @@
     {% for doc in response.docs %}
       <table class="record">
         <tr>
-          <td>{{ doc.count }}.</td>
+          <td>
+		&nbsp;
+          </td>
           <td width="10%">
-            {% if doc.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />{% endif %}
+            {% if doc.isbn_numeric %}<img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />
+            {% else %} <img src="/media/001/covernot.gif" />  {% endif  %}
           </td>
           <td align="left" width="80%">
             <div class="title">
