@@ -19,9 +19,9 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('helios.discovery.views',
-    (r'^$', 'index'),
-    (r'^search/$', 'search'),
-    (r'^feed/atom/$', 'atomFeed'),
-    (r'^feed/rss/$', 'rssFeed'),
+    url(r'^$', 'index', name='discovery-index'),
+    url(r'^search$', 'search', name='discovery-search'),
+    #(r'^feed/atom/$', 'atomFeed'),
+    #(r'^feed/rss/$', 'rssFeed'),
 )
 

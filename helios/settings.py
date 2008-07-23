@@ -110,15 +110,133 @@ INSTALLED_APPS = (
     'helios.catalog',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'helios.context_processors.base_url',
+CACHE_BACKEND = 'locmem:///'
+
+
+## Settings specific to this project (that is, non-Django) ##
+
+SOLR_URL = 'http://localhost:8983/solr/select/'
+
+# "III" is the only functional choice right now
+ILS = ''
+
+# MAJAX_URL is for use with http://libx.org/majax/ 
+# (has no effect if ILS != 'III')
+MAJAX_URL = ''
+
+# Set CATALOG_RECORD_URL to something else if you want to pass through
+# to your catalog, e.g. 'http://innopac.library.drexel.edu/record=%s'.
+# The %s is replaced by the item id.
+CATALOG_RECORD_URL = ''
+
+# Number of facet terms to display by default.
+MAX_FACET_TERMS_BASIC = 4    
+
+# Number of facet terms to display when you hit "show more".
+MAX_FACET_TERMS_EXPANDED = 25 
+
+# Number of terms to display for index facets.
+INDEX_FACET_TERMS = 20
+
+# Facet display on the index page.  Note that values for "field" are 
+# appended with "_facet".  If sort_by_count is False, terms will be 
+# sorted "in their natural index order" according to Solr docs -- 
+# usually alphabetical.
+INDEX_FACETS = [
+    { 
+        'name': ugettext('Names'), 
+        'field': 'personal_name', 
+        'sort_by_count': True, 
+    }, 
+    { 
+        'name': ugettext('Topics'), 
+        'field': 'topic', 
+        'sort_by_count': True, 
+    },    
+    { 
+        'name': ugettext('Languages'), 
+        'field': 'language', 
+        'sort_by_count': True, 
+    },                            
+]
+
+# Facet display in the results sidebar.
+FACETS = [
+    { 
+        'name': ugettext('Name'), 
+        'field': 'name', 
+        'sort_by_count': True, 
+    }, 
+    { 
+        'name': ugettext('Topic'), 
+        'field': 'topic', 
+        'sort_by_count': True, 
+    },    
+    { 
+        'name': ugettext('Genre'), 
+        'field': 'genre', 
+        'sort_by_count': True, 
+    },                            
+    { 
+        'name': ugettext('Language'), 
+        'field': 'language', 
+        'sort_by_count': True, 
+    },                            
+    { 
+        'name': ugettext('Dubbed Language'), 
+        'field': 'language_dubbed', 
+        'sort_by_count': True, 
+    }, 
+    { 
+        'name': ugettext('Subtitled Language'), 
+        'field': 'language_subtitles', 
+        'sort_by_count': True, 
+    }, 
+    { 
+        'name': ugettext('Format'), 
+        'field': 'format', 
+        'sort_by_count': True, 
+    },                         
+    { 
+        'name': ugettext('Place'), 
+        'field': 'place', 
+        'sort_by_count': True, 
+    },    
+    { 
+        'name': ugettext('Author'), 
+        'field': 'author',
+        'sort_by_count': True, 
+    },
+    { 
+        'name': ugettext('Year of Publication'), 
+        'field': 'year', 
+        'sort_by_count': True, 
+    },
+#    {
+#        'name': ugettext('Dewey Range'), 
+#        'field': 'callnumlayerone', 
+#        'sort_by_count': False, 
+#    },
+#    { 
+#        'name': ugettext('Dewey Range'), 
+#        'field': 'callnumlayertwo', 
+#        'sort_by_count': False, 
+#    }, 
+#    { 
+#        'name': ugettext('Availability'), 
+#        'field': 'availability', 
+#        'sort_by_count': False, 
+#    },
+]
+
+ITEMS_PER_PAGE = 10
+
+# Sort options for results, by (DISPLAY, SOLR_PARAM).
+SORTS = (
+    (ugettext('newest'), 'year desc'),
+    (ugettext('oldest'), 'year asc'),
+    (ugettext('relevance'), ''),
+    (ugettext('title'), 'title_sort asc'),
 )
 
-## settings specific to this project (that is, non-Django)
-
-# "III" is the only choice right now
-ILS = ''
+SEARCH_CACHE_TIME = 6000    # in seconds

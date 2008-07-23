@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% comment %}
+  Copyright 2007 Michael Beccaria
+
+  This file is part of Helios.
+
+  Helios is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Helios is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Helios.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load i18n %}
+{% load discovery_extras %}
+{% block title %}Helios | {{ doc.title }}{% endblock %}
+{% block body %}
+  <div class="record">
+    <div class="cover">
+      <a href="{{ doc.record_url }}">
+        {% if doc.upc %}
+          <img src="http://worldcat.org/wcpa/servlet/DCARead?standardNo={{ doc.upc|slice:":-1" }}&standardNoType=6" />
+        {% else %}{% if doc.isbn_numeric %}
+          <img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />
+        {% endif %}{% endif %}
+      </a>
+    </div>
+    <div class="recordinfo">
+      {# title_link is in globaltags/globals.py #}
+      <h2 class="title">{{ doc.full_title }}</h2>
+      {% if doc.author %}
+        <div class="author">
+          <span class="metadata">{% trans "Author:" %}</span>
+          {% for author in doc.author %}
+            <a href="{% new_limit "author" author %}">{{ author }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if doc.name %}
+        <div class="names">
+          <span class="metadata">{% trans "Names:" %}</span>
+          {% for name in doc.name %}
+            <a href="{% new_limit "name" name %}">{{ name }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if doc.topic %}
+        <div class="topics">
+          <span class="metadata">{% trans "Topics:" %}</span>
+          {% for topic in doc.topic %}
+            <a href="{% new_limit "topic" topic %}">{{ topic }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if doc.imprint %}
+        <div class="imprint">
+          <span class="metadata">{% trans "Imprint:" %}</span>
+          {{ doc.imprint }}
+        </div>
+      {% endif %}
+      {%if doc.pubdate %}
+        (<a href="{{ BASE_URL }}search/?query={{ doc.pubdate }}&field=pubdate">{{ doc.pubdate }}</a>)
+      {% endif %}
+{% comment %}
+    <div class="callnum">
+      {%if doc.LCClass %}
+        {%for LCNum in doc.LCClass %}
+          {% trans "Call number: " %}{{ LCNum }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      {% endif %}
+      {%if doc.DeweyClass %}
+        {%for DeweyNum in doc.DeweyClass %}
+          {% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      {% endif %}
+      {{ callnum }}
+    </div>
+    {% if doc.url %}
+      {%for url in doc.url %}
+        <div class="url">
+          <a href="{{ url }}">{% trans "Online resource" %}</a>
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% if doc.SSurldetails %}
+      <div class="Journallinks">
+        <ul>
+          {% for SSurls in doc.SSurldetails %}
+            <li>
+              <span class="findit">{%trans "Find it here" %}</span> -&gt;
+              {% for tmp in SSurls %}
+                <a href="{{ tmp }}">{{ tmp }}</a>
+              {% endfor %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+{% endcomment %}
+      {% if doc.format %}
+        <div class="format {{ doc.format }}">
+          <span class="metadata">{% trans "Format:" %}</span>
+          <span>{{ doc.format }}</span>
+        </div>
+      {% endif %}
+      <div class="holdings">
+        <span class="metadata">{% trans "Holdings:" %}</span>
+        {% ifequal ILS "III" %}
+          <span class="majax-showholdings" title=".{{ doc.id }}"></span>
+        {% endifequal %}
+        {% ifequal doc.availability "Available" %}
+          <span class="available">{{ doc.availability }}</span>
+        {% endifequal %}                               
+        {% ifequal doc.availability "Unavailable" %}
+          <span class="unavailable">{{ doc.availability }}</span>
+        {% endifequal %}
+      </div>
+    </div>
+  </div>    
+{% endblock %}

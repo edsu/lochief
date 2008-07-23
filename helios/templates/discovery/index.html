@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% comment %}
+  Copyright 2007 Casey Durfee
+  Copyright 2007 Gabriel Farrell
+
+  This file is part of Helios.
+
+  Helios is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Helios is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Helios.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load i18n %}
+{% load discovery_extras %}
+{% block head %}
+  <script type="text/javascript">
+    window.onload = setFocus;
+  </script>
+{% endblock %}
+{% block body %}
+  <h2 id="index-facets-heading">Top {{ INDEX_FACET_TERMS }} Tags:</h2>
+  <div id="index-facets">
+    {% for facet in facets %}
+    <div>
+      <h3>{{ facet.name }}</h3>
+      <ul>
+        {% for term, count in facet.terms %}
+          <li><a href="{% new_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}
