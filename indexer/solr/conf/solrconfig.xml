@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!--  For more information see http://wiki.apache.org/solr/SolrConfigXml -->
+<config>
+  <indexDefaults>
+    <useCompoundFile>false</useCompoundFile>
+    <mergeFactor>10</mergeFactor>
+    <maxBufferedDocs>1000</maxBufferedDocs>
+    <maxMergeDocs>2147483647</maxMergeDocs>
+    <maxFieldLength>10000</maxFieldLength>
+    <writeLockTimeout>1000</writeLockTimeout>
+    <commitLockTimeout>10000</commitLockTimeout>
+  </indexDefaults>
+  <mainIndex>
+    <useCompoundFile>false</useCompoundFile>
+    <mergeFactor>10</mergeFactor>
+    <maxBufferedDocs>1000</maxBufferedDocs>
+    <maxMergeDocs>2147483647</maxMergeDocs>
+    <maxFieldLength>10000</maxFieldLength>
+    <unlockOnStartup>false</unlockOnStartup>
+  </mainIndex>
+  <updateHandler class="solr.DirectUpdateHandler2">
+  </updateHandler>
+  <query>
+    <maxBooleanClauses>1024</maxBooleanClauses>
+    <filterCache
+      class="solr.LRUCache"
+      size="4000000"
+      initialSize="4000000"
+      autowarmCount="2000000"/>
+    <queryResultCache
+      class="solr.LRUCache"
+      size="2048"
+      initialSize="2048"
+      autowarmCount="1024"/>
+    <documentCache
+      class="solr.LRUCache"
+      size="2048"
+      initialSize="2048"
+      autowarmCount="0"/>
+    <useFilterForSortedQuery>true</useFilterForSortedQuery>
+    <queryResultWindowSize>10</queryResultWindowSize>
+    <HashDocSet maxSize="10000" loadFactor="0.75"/>
+    <boolTofilterOptimizer enabled="true" cacheSize="32" threshold=".05"/>
+  </query>
+  <requestHandler name="standard" class="solr.StandardRequestHandler">
+  </requestHandler>
+  <requestHandler name="dismax" class="solr.DisMaxRequestHandler" >
+    <lst name="defaults">
+     <float name="tie">0.01</float>
+     <str name="qf">
+        text^0.5 title^1.0 name^0.8 author^0.9 full_title^0.6 id^10.0
+     </str>
+     <str name="pf">
+        text^0.2 title^1.1
+     </str>
+     <str name="bf">
+        recip(rord(pubyear),1,1000,1000)^0.3
+     </str>
+     <str name="mm">
+        2&lt;-1 5&lt;-2 6&lt;90%
+     </str>
+     <int name="ps">100</int>
+    </lst>
+  </requestHandler>
+  <requestHandler name="/update/csv" class="solr.CSVRequestHandler" startup="lazy">
+  </requestHandler>
+  <requestDispatcher handleSelect="true" >
+    <requestParsers enableRemoteStreaming="true" multipartUploadLimitInKB="2048" />
+  </requestDispatcher>
+  <admin>
+    <defaultQuery>solr</defaultQuery>
+    <gettableFiles>solrconfig.xml schema.xml admin-extra.html</gettableFiles>
+    <pingQuery>q=id:0&amp;start=0&amp;rows=0</pingQuery>
+  </admin>
+</config>

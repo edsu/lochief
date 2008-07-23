@@ -1,0 +1,7 @@
+Copy or link the files in solr/conf/ to the solr/conf directory of
+your running Solr instance.  Do the same for the files in solr/lib
+(you may need to create the lib directory) -- the schema.xml in
+solr/conf depends on them.
+
+MARC imports depend on the pymarc python library.  See 
+http://pypi.python.org/pypi/pymarc

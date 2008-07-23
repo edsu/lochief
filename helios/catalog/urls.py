@@ -19,5 +19,5 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('helios.catalog.views',
-    (r'^$', 'item'),
+    url(r'^(\w+)$', 'record', name='catalog-record'),
 )

@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% comment %}
+  Copyright 2007 Casey Durfee
+  Copyright 2008 Gabriel Sean Farrell
+
+  This file is part of Helios.
+
+  Helios is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Helios is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Helios.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load i18n %}
+{% load discovery_extras %}
+{% block title %}
+  {% blocktrans %} Search{% endblocktrans %}
+{% endblock %}
+{% block head %}
+  <!--
+  <link rel="alternate" type="application/atom+xml" href="/feed/atom/?{{ get }}" />
+  <link rel="alternate" type="application/rss+xml" href="/feed/rss/?{{ get }}" />
+  -->
+  {% ifequal ILS "III" %}
+    <script type="text/javascript" src="{{ MAJAX_URL }}"></script>
+  {% endifequal %}
+  <script type="text/javascript">
+    function init() {
+      {% if not limits %}
+        $('show-more-suggested').innerHTML = "{% trans "Show More..." %}"
+        $('show-fewer-suggested').innerHTML = "{% trans "Show Fewer..." %}"
+        $('show-more-suggested').onclick = function() {
+          showMore(this, 'facet-list-ext-suggested', 'show-fewer-suggested');
+        };
+        $('show-fewer-suggested').onclick = function() {
+          showFewer(this, 'facet-list-ext-suggested', 'show-more-suggested');
+        };
+      {% endif %}
+      {% for facet in facets %}
+        {% if facet.has_more %}
+          $('show-more-{{ facet.field }}').innerHTML = "{% trans "Show More..." %}"
+          $('show-fewer-{{ facet.field }}').innerHTML = "{% trans "Show Fewer..." %}"
+          $('show-more-{{ facet.field }}').onclick = function() {
+            showMore(this, 'facet-list-ext-{{ facet.field }}', 'show-fewer-{{ facet.field }}');
+          };
+          $('show-fewer-{{ facet.field }}').onclick = function() {
+            showFewer(this, 'facet-list-ext-{{ facet.field }}', 'show-more-{{ facet.field }}');
+          };
+        {% endif %}
+      {% endfor %}
+    }
+    window.onload = init;
+  </script>
+{% endblock %}
+{% block body %}
+  <div id="sidebar">
+    {% if not limits %}
+      {% for facet in facets %}
+        {% ifequal facet.name "Topic" %}
+            <div id="suggested">
+              <h3>{% trans "Were You Looking For:" %}</h3>
+              <ul>
+                {% for term, count in facet.terms %}
+                  <li><a href="{% new_limit facet.field term %}">{{ term }}</a></li>
+                {% endfor %}
+              </ul>
+              {% if facet.has_more %}
+                <ul class="hidden" id="facet-list-ext-suggested">
+                  {% for term, count in facet.extended_terms %}
+                    <li><a href="{% new_limit facet.field term %}">{{ term }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+              {% if facet.has_more %}
+                <span id="show-more-suggested" class="jsclick"></span>
+                <span id="show-fewer-suggested" class="hidden jsclick"></span>
+              {% endif %}
+            </div>
+        {% endifequal %}
+      {% endfor %}
+    {% endif %}
+    <div id="facets">
+      {% if limits %}
+        <h3>{% trans "Current refinements:" %}</h3>
+        <div class="remove-facet-list">
+          <ul> 
+            {% for limit in limits %}
+              <li>{{ limit }} <a href="{% remove_limit %}">(remove)</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <br />
+      {% endif %} 
+      {% if facets %}
+        <h3>{% trans "Refine your search:" %}</h3>
+        {% for facet in facets %}
+          <div class="facet-list" id="facet-list-{{ facet.field }}">
+            <strong>{{ facet.name }}</strong>
+            <ul>
+              {% for term, count in facet.terms %}
+                <li><a href="{% add_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
+              {% endfor %}
+              {% if facet.has_more %}
+                <span class="hidden" id="facet-list-ext-{{ facet.field }}">
+                  {% for term, count in facet.extended_terms %}
+                    <li><a href="{% add_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
+                  {% endfor %}
+                </span>
+              {% endif %}
+            </ul>
+            {% if facet.has_more %}
+              <span id="show-more-{{ facet.field }}" class="jsclick"></span>
+              <span id="show-fewer-{{ facet.field }}" class="hidden jsclick"></span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+  {% if response.docs %}
+    <div id="results">
+      <div id="topbar">
+        <div id="sort_by">
+          {% trans "Sort by:" %}
+          {% for sort in sorts %}
+            {% ifequal sort current_sort %}
+              <span>{{ sort }}</span>
+            {% else %}
+              <span><a href="{% add_sort sort %}">{{ sort }}</a></span>
+            {% endifequal %}
+          {% endfor %}
+        </div>
+        <div id="result_details">
+          {% spaceless %}
+            {# span tags are necessary for spaceless to work #}
+            {% trans "Results" %} 
+            <strong>{{ start_number }}-{{ end_number }}</strong> 
+            {% trans "of" %} 
+            <strong>{{ number_found }}</strong> 
+            {% trans "for" %} 
+            {% if query %}
+              <strong>{{ query }}</strong>
+            {% else %}
+              <span>{% trans "a search returning everything" %}</span>
+            {% endif %}
+            {% if limits_str %}
+              {% trans "with" %} {{ limits_str|safe }}
+            {% endif %} 
+            <span>.</span>
+          {% endspaceless %}
+        </div>
+      </div> 
+      {% if pagination.previous_page or pagination.next_page %}
+        <div id="pagination-top">
+          {% include "discovery/snippets/pagination.html" %}
+        </div>
+      {% endif %}
+      <ol>
+        {% for doc in response.docs %}
+          <li class="record">
+            <div class="cover">
+              <a href="{{ doc.record_url }}">
+                {% if doc.upc %}
+                  <img src="http://worldcat.org/wcpa/servlet/DCARead?standardNo={{ doc.upc|slice:":-1" }}&standardNoType=6" />
+                {% else %}{% if doc.isbn_numeric %}
+                  <img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />
+                {% endif %}{% endif %}
+              </a>
+            </div>
+            <div class="recordinfo">
+              <h2 class="title">{% title_link %}</h2>
+              {% if doc.author %}
+                <div class="author">
+                  <span class="metadata">{% trans "Author:" %}</span>
+                  {% for author in doc.author %}
+                    <a href="{% new_limit "author" author %}" title="{% trans "Search for" %} {{ author }}">{{ author }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              {% if doc.name %}
+                <div class="names">
+                  <span class="metadata">{% trans "Names:" %}</span>
+                  {% for name in doc.name %}
+                  <a href="{% new_limit "name" name %}" title="{% trans "Search for" %} {{ name }}">{{ name }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              {% if doc.topic %}
+                <div class="topics">
+                  <span class="metadata">{% trans "Topics:" %}</span>
+                  {% for topic in doc.topic %}
+                    <a href="{% new_limit "topic" topic %}" title="{% trans "Search for" %} {{ topic }}">{{ topic }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+              {% if doc.imprint %}
+                <div class="imprint">
+                  <span class="metadata">{% trans "Imprint:" %}</span>
+                  {{ doc.imprint }}
+                </div>
+              {% endif %}
+        {% comment %}
+              {%if doc.pubyear %}
+                (<a href="{{ BASE_URL }}search/?query={{ doc.pubyear }}&field=pubyear">{{ doc.pubyear }}</a>)
+              {% endif %}
+            <div class="callnum">
+              {%if doc.LCClass %}
+                {%for LCNum in doc.LCClass %}
+                  {% trans "Call number: " %}{{ LCNum }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% endif %}
+              {%if doc.DeweyClass %}
+                {%for DeweyNum in doc.DeweyClass %}
+                  {% trans "Call number: "%}{{DeweyNum}}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              {% endif %}
+              {{ callnum }}
+            </div>
+            {% if doc.url %}
+              {%for url in doc.url %}
+                <div class="url">
+                  <a href="{{ url }}">{% trans "Online resource" %}</a>
+                </div>
+              {% endfor %}
+            {% endif %}
+            {% if doc.SSurldetails %}
+              <div class="Journallinks">
+                <ul>
+                  {% for SSurls in doc.SSurldetails %}
+                    <li>
+                      <span class="findit">{%trans "Find it here" %}</span> -&gt;
+                      {% for tmp in SSurls %}
+                        <a href="{{ tmp }}">{{ tmp }}</a>
+                      {% endfor %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          {% endcomment %}
+              {% if doc.format %}
+                <div class="format {{ doc.format }}">
+                  <span class="metadata">{% trans "Format:" %}</span>
+                  <a href="{% new_limit "format" doc.format %}" title="{% trans "Search for " %}{{ doc.format }}">
+                    <span>{{ doc.format }}</span>
+                  </a>
+                </div>
+              {% endif %}
+              <div class="holdings">
+                <span class="metadata">{% trans "Holdings:" %}</span>
+                {% ifequal ILS "III" %}
+                  <span class="majax-showholdings" title=".{{ doc.id }}"></span>
+                {% endifequal %}
+                {% ifequal doc.availability "Available" %}
+                  <span class="available">{{ doc.availability }}</span>
+                {% endifequal %}                               
+                {% ifequal doc.availability "Unavailable" %}
+                  <span class="unavailable">{{ doc.availability }}</span>
+                {% endifequal %}
+              </div>
+            </div>
+          </li>    
+        {% endfor %}
+      </ol>  
+      {% if pagination.previous_page or pagination.next_page %}
+        <div id="pagination-bottom">
+          {% include "discovery/snippets/pagination.html" %}
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div id="noresults">Your search for <strong>{{ query }}</strong> returned no results.  Please try another search.</div>
+  {% endif %}
+  {% if DEBUG %}
+    <div><a href="{{ solr_url }}">Solr URL </a></div>
+  {% endif %}
+{% endblock %}
