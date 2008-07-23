@@ -16,17 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf import settings
 from django.conf.urls.defaults import *
 
+import settings
+
 urlpatterns = patterns('',
-    url(r'^catalog/', include('helios.catalog.urls')),
-    url(r'', include('helios.discovery.urls')),
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
+    (r'^catalog/', include('helios.catalog.urls')),
+    (r'', include('helios.discovery.urls')),
 )
-
-if settings.DEBUG:
-    urlpatterns += patterns('', 
-        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', 
-            {'document_root': settings.MEDIA_ROOT}),
-    )
-

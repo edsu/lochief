@@ -21,32 +21,12 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
   <head>
-    <title>{% trans "Helios" %}{% block title %}{% endblock %}</title>
+    <title>{% block title %}{% trans "Helios" %}{% endblock %}</title>
     <link href="{{ MEDIA_URL }}001/001.css" type="text/css" rel="stylesheet" media="screen" />
     <script src="{{ MEDIA_URL }}js/base.js"></script>
     {% block head %}{% endblock %}
   </head>
   <body>
-    <div id="container">
-      <div id="header">
-        <h1 id="logo"><a href="{% url discovery-index %}"><span>Helios</span></a></h1>
-        <div id="searchform">
-          <form action="{% url discovery-search %}" name="search">
-            <input type="text" id="id_query" name="q" value="{{ query }}"/>
-            {% comment %}
-            <!-- commented out in favor of power and advanced search -->
-            <select name="field" id="id_field"> 
-              {% for name, field in fields %}
-                <option value="{{ field }}"{% ifequal field current_field %} selected="true"{% endifequal %}>{{ name }}</option>
-              {% endfor %}
-            </select>
-            {% endcomment %}
-            <input type="submit" value="{% trans "Search" %}"/>
-          </form>
-        </div>  
-      </div>
-      {% block body %}{% endblock %}
-    </div>
-    <div id="powered">Powered by <a href="http://code.google.com/p/fac-back-opac/">Helios</a>.</div>
+  {% block body %}{% endblock %}
   </body>
 </html>

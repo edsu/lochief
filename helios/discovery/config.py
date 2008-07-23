@@ -17,6 +17,7 @@
 
 from django.utils.translation import ugettext as _
 
+SOLR_SERVER = "localhost:8983"
 SEARCH_CACHE_TIME = 6000    # in seconds
 ITEMS_PER_PAGE = 10
 MAX_FACET_TERMS_BASIC = 4    # how many facet terms display by default
@@ -32,80 +33,22 @@ OPAC_FULL_BIB_URL = "http://sirsiweb.laurentian.ca/uhtbin/cgisirsi/x/x/x/57/5/?u
 # 1 : Make item title a link to the detailed view in fac-back-opac
 LOCAL_ITEM_DISPLAY = 1
 
-## FACETS has several settings.
-# name = Display name on the opac
-# code = solr field name
-# search = field name to search by when clicked
-# sort_by = whether you want the facets sorted by count. Values 
-#     can be count, alpha, and reverse_alpha (for reverse alphabetical order)
-FACETS = [
-    { 
-        'name': _('Name'), 
-        'code': 'name_facet', 
-        'search': 'name', 
-        'sort_by': 'count', 
-    }, 
-    { 
-        'name': _('Topic'), 
-        'code': 'topic_facet', 
-        'search': 'topic', 
-        'sort_by': 'count', 
-    },    
-    { 
-        'name': _('Genre'), 
-        'code': 'genre', 
-        'search': 'genre', 
-        'sort_by': 'count', 
-    },                            
-    { 
-        'name': _('Language'), 
-        'code': 'language', 
-        'search': 'language', 
-        'sort_by': 'count', 
-    }, 
-#    { 
-#        'name': _('Year of Publication'), 
-#        'code': 'pubyear', 
-#        'search': 'pubyear', 
-#        'sort_by': 'reverse_alpha', 
-#    },
-    { 
-        'name': _('Format'), 
-        'code': 'format', 
-        'search': 'format', 
-        'sort_by': 'count', 
-    },                         
-    { 
-        'name': _('Place'), 
-        'code': 'place', 
-        'search': 'place', 
-        'sort_by': 'count', 
-    },    
-    {
-        'name': _('Dewey Range'), 
-        'code': 'callnumlayerone', 
-        'search': 'callnumlayerone', 
-        'sort_by': 'alpha', 
-    },
-    { 
-        'name': _('Dewey Range'), 
-        'code': 'callnumlayertwo', 
-        'search': 'callnumlayertwo', 
-        'sort_by': 'alpha', 
-    }, 
-    { 
-        'name': _('Availability'), 
-        'code': 'availability', 
-        'search': 'availability', 
-        'sort_by': 'alpha', 
-    },
-    { 
-        'name': _('Author'), 
-        'code': 'author_exact',
-        'search': 'author',
-        'sort_by': 'alpha', 
-    },
-]
+#FACETS has several settings.
+#name = Display name on the opac
+#code = solr field name
+#sortbycount = whether you want the facets sorted by count. Values can be true, false, and reverse (for reverse alphabetical order)
+#facetlocation =  can be used to display facets in different areas of the screen, as determined by your template. Was originally made to put dewey/lc callnum ranges on top of screen like NCSU
+FACETS = [    { 'name' : _('Dewey Range'), 'code' : 'callnumlayerone', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'},
+              { 'name' : _('Dewey Range'), 'code' : 'callnumlayertwo', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'}, 
+              { 'name' : _('Topic'), 'code' : 'topic', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },    
+              { 'name' : _('Genre'), 'code' : 'genre', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'},                            
+              { 'name' : _('Format'), 'code' : 'format', 'sortbycount' : 'true', 'facetlocation' : 'sidebar' },                         
+              { 'name' : _('Region'), 'code' : 'place' , 'sortbycount' : 'true', 'facetlocation' : 'sidebar'},    
+              { 'name' : _('Language'), 'code' : 'language', 'sortbycount' : 'true' , 'facetlocation' : 'sidebar'}, 
+              { 'name' : _('Author'), 'code' : 'author_exact','sortbycount' : 'false' , 'facetlocation' : 'sidebar' },
+              { 'name' : _('Publication Date'), 'code' : 'pubdaterange', 'sortbycount' : 'reverse', 'facetlocation' : 'sidebar' },
+              { 'name' : _('Availability'), 'code' : 'availability', 'sortbycount' : 'false' , 'facetlocation' : 'sidebar'},
+              ]
 
 #items listed in the search dropdown box
 SEARCH_INDEXES = [ {'name' : _('Anywhere'), 'index': 'text'},
@@ -113,8 +56,8 @@ SEARCH_INDEXES = [ {'name' : _('Anywhere'), 'index': 'text'},
                   {'name' : _('Subject'), 'index': 'subject'}, { 'name' : _('ISBN'), 'index' : 'isbn' },]
 
 #items to be listed in the "Sort By:" Dropdown box
-SORTS = [{ 'name' : _('Pub. Date (newest first)'), 'direction' : 'desc', 'field' : 'pubyear' },
-         { 'name' : _('Pub. Date (oldest first)'), 'direction' : 'asc', 'field' : 'pubyear' },
+SORTS = [{ 'name' : _('Pub. Date (newest first)'), 'direction' : 'desc', 'field' : 'pubdate' },
+         { 'name' : _('Pub. Date (oldest first)'), 'direction' : 'asc', 'field' : 'pubdate' },
          { 'name' : _('Author A-Z'), 'direction' : 'desc', 'field' : 'author_exact' },]
 
 #Icons corresponding to item type

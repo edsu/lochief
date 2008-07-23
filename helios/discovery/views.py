@@ -1,5 +1,4 @@
 # Copyright 2007 Casey Durfee
-# Copyright 2008 Gabriel Sean Farrell
 #
 # This file is part of Helios.
 # 
@@ -16,272 +15,195 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-import pprint
-import re
-import string
-import sys
-import time
 import urllib
+import pprint
+import time
+import re
+import sys
+import string
 
-from django.conf import settings
-from django.core.cache import cache
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse
-from django.template import RequestContext
-from django.template.loader import get_template
-from django.utils import simplejson
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.views.decorators.vary import vary_on_headers
+from django.shortcuts import render_to_response
 from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
-from django.utils.translation import ugettext as _
-from django.views.decorators.vary import vary_on_headers
+from django.core.cache import cache
+from django.template import RequestContext
+
+from helios import settings
+from config import ITEMS_PER_PAGE, FACETS, SOLR_SERVER, MAX_FACET_TERMS_EXPANDED, SEARCH_CACHE_TIME, MAX_FACET_TERMS_BASIC, SEARCH_INDEXES, SORTS, LOCAL_LOGO_LOCATION, LOCAL_INSTITUTION_NAME, LOCAL_ITEM_DISPLAY, FORMAT_ICONS
+
+facetCodes = [ f['code'] for f in FACETS ]
+allFacets = FACETS
 
 @vary_on_headers('accept-language', 'accept-encoding')
 def index(request):
-    cache_key = request.META['HTTP_HOST']
-    response = cache.get(cache_key)
-    if response:
-        return response
-    context = RequestContext(request)
-    params = [
-        ('rows', 0),
-        ('facet', 'true'),
-        ('facet.limit', settings.INDEX_FACET_TERMS),
-        ('facet.mincount', 1),
-        ('q.alt', '*:*'),
-    ]
-    for facet_option in settings.INDEX_FACETS:
-        params.append(('facet.field', facet_option['field'] + '_facet'))
-        # sort facets by name vs. count as per the config.py file        
-        if not facet_option['sort_by_count']:
-            params.append(('f.%s.facet.sort' % facet_option['field'], 
-                'false'))
-    solr_url, solr_response = get_solr_response(params)
-    try:
-        facet_fields = solr_response['facet_counts']['facet_fields']
-    except KeyError, e:
-        raise KeyError, 'Key not found in Solr response: %s' % e
-    facets = []
-    for facet_option in settings.INDEX_FACETS:
-        field = facet_option['field']
-        terms = facet_fields[field + '_facet']
-        facet = {
-            'terms': terms,
-            'field': field,
-            'name': facet_option['name'],
-        }
-        facets.append(facet)
-    context['facets'] = facets
-    context['INDEX_FACET_TERMS'] = settings.INDEX_FACET_TERMS
-    template = get_template('discovery/index.html')
-    response = HttpResponse(template.render(context))
-    if not settings.DEBUG:
-        cache.set(cache_key, response)
-    return response
+    context = {}
+    context['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
+    return render_to_response('index.html', context, 
+            context_instance=RequestContext(request))
 
 @vary_on_headers('accept-language', 'accept-encoding')
 def search(request):
-    context = RequestContext(request)
-    context.update(get_search_results(request))
+    start = time.time()
+    context = getsearchresults(request)
+    if context == None:
+        return HttpResponseRedirect(settings.BASE_URL)
+    context['LOCAL_LOGO_LOCATION'] = LOCAL_LOGO_LOCATION
+    context['LOCAL_INSTITUTION_NAME'] = LOCAL_INSTITUTION_NAME
     context['ILS'] = settings.ILS
-    context['MAJAX_URL'] = settings.MAJAX_URL
-    template = get_template('discovery/search.html')
-    return HttpResponse(template.render(context))
 
-LIMITS_RE = re.compile(r"""
-(
-  [+-]?      # grab an optional + or -
-  [\w]+      # then a word 
-):           # then a colon
-(
-  ".*?"|     # then anything surrounded by quotes 
-  \(.*?\)|   # or parentheses
-  \[.*?\]|   # or brackets,
-  [\S]+      # or non-whitespace strings
-)
-""", re.VERBOSE | re.UNICODE)
-def pull_limits(limits):
-    """
-    Pulls individual limit fields and queries out of a combined 
-    "limits" string and returns (1) a list of limits and (2) a list
-    of fq parameters, with "_facet" added to the end of each field, 
-    to send on to Solr.
-    """
-    parsed_limits = LIMITS_RE.findall(limits)
-    limit_list = []
-    fq_params = []
-    for limit in parsed_limits:
-        field, query = limit
-        limit = u'%s:%s' % (field, query)
-        limit_list.append(limit)
-        fq_param = u'%s_facet:%s' % (field, query)
-        fq_params.append(fq_param)
-    return limit_list, fq_params
-
-POWER_SEARCH_RE = re.compile(r"""
-".+?"|         # ignore anything surrounded by quotes
-(
-  (?:
-    [+-]?      # grab an optional + or -
-    [\w]+:     # then a word with a colon
-  )
-  (?:
-    ".+?"|     # then anything surrounded by quotes 
-    \(.+?\)|   # or parentheses
-    \[.+?\]|   # or brackets,
-    [\S]+      # or non-whitespace strings
-  )
-)
-""", re.VERBOSE | re.UNICODE)
-def pull_power(query):
-    """
-    Pulls "power search" parts out of the query.  It returns
-    (1) the query without those parts and (2) a list of those parts.
-
-    >>> query = 'title:"tar baby" "toni morrison" -topic:(dogs justice) fiction "the book:an adventure" +author:john'
-    >>> pull_power(query)
-    (' "toni morrison"  fiction "the book:an adventure" ', ['title:"tar baby"', '-topic:(dogs justice)', '+author:john'])
-    >>> 
-    """
-    power_list = POWER_SEARCH_RE.findall(query)
-    # drop empty strings
-    power_list = [x for x in power_list if x] 
-    # escape for re
-    escaped_power = [re.escape(x) for x in power_list]
-    powerless_query = re.sub('|'.join(escaped_power), '', query)
-    return powerless_query, power_list
-
-def get_solr_response(params):
-    default_params = [
-        ('wt', 'json'),
-        ('json.nl', 'arrarr'), # for returning facets nicer
-        ('qt', 'dismax'), # use DisMaxRequestHandler
-    ]
-    params.extend(default_params)
-    urlparams = urllib.urlencode(params)
-    url = '%s?%s' % (settings.SOLR_URL, urlparams)
-    try:
-        solr_response = urllib.urlopen(url)
-    except IOError:
-        raise IOError, 'Unable to connect to the Solr instance.'
-    try:
-        response = simplejson.load(solr_response)
-    except ValueError, e:
-        solr_response = urllib.urlopen(url).read()
-        raise ValueError, 'Solr response was not a JSON object.'
-    return url, response
-
-def get_search_results(request): 
-    query = request.GET.get('q', '')
-    page_str = request.GET.get('page')
-    try:
-        page = int(page_str)
-    except (TypeError, ValueError):
-        page = 1
-    #cache_key = '%s~%s' % (query, page)
-    cache_key = request.META['QUERY_STRING']
-    context = cache.get(cache_key)
-    if context:
-        return context
-    context = {}
-    context['current_sort'] = _('newest')
-    context['sorts'] = [x[0] for x in settings.SORTS]
-    zero_index = (settings.ITEMS_PER_PAGE * (page - 1))
-    params = [
-        ('rows', settings.ITEMS_PER_PAGE),
-        ('facet', 'true'),
-        ('facet.limit', settings.MAX_FACET_TERMS_EXPANDED),
-        ('facet.mincount', 1),
-        ('start', zero_index)
-    ]
-    for facet in settings.FACETS:
-        params.append(('facet.field', facet['field'] + '_facet'))
-        # sort facets by name vs. count as per the config.py file        
-        if not facet['sort_by_count']:
-            params.append(('f.%s.facet.sort' % facet['field'], 'false'))
-    powerless_query, field_queries = pull_power(query)
-    if not powerless_query.strip() or powerless_query == '*':
-        params.append(('q.alt', '*:*'))
-        context['sorts'] = [x[0] for x in settings.SORTS 
-                if x[0] != _('relevance')]
+    # render using appropriate
+    if context['format'] and context['format'] == "py": 
+        resp = HttpResponse( pprint.pformat(context) )
+        resp.headers['Content-Type'] = "text/plain" ; return resp
     else:
-        params.append(('q', powerless_query.encode('utf8')))
-        context['current_sort'] = _('relevance')
-    for field_query in field_queries:
-        params.append(('fq', field_query.encode('utf8')))
-    limits_param = request.GET.get('limits', '')
-    limits, fq_params = pull_limits(limits_param)
-    for fq_param in fq_params:
-        params.append(('fq', fq_param.encode('utf8')))
+        context['response_time'] = "%.4f" % ( time.time() - start )
+        return render_to_response("search.html", context,
+                context_instance=RequestContext(request))
 
-    sort = request.GET.get('sort')
-    if sort:
-        context['current_sort'] = sort
-        for sort_mapping in settings.SORTS:
-            if sort_mapping[0] == sort:
-                mapped_sort = sort_mapping[1]
-        params.append(('sort', mapped_sort))
-    # TODO: set up for nice display page for queries that return no results
-    # or cause solr errors
-    try:
-        solr_url, solr_response = get_solr_response(params)
-    except ValueError:
-        return {'query': query}
-    context.update(solr_response)
+def makeSearchString(q, index, limits, sort):
+    if q == "*":
+        q = "[* TO *]"
+    ret = '%s:%s' % (index, q) 
+    for limitOn in limits:
+        ret = """%s AND %s""" % (ret, limitOn)
+    if sort is not None and len(sort) > 0:
+        ret = """%s ; %s""" % (ret, sort) 
+    return iri_to_uri(urlquote(ret))
 
+def getsearchresults(request): 
+    q = request.GET.get('q', None)
+    
+    searchString = q
+    limits = []
+    if not q:
+        return None
+    index = request.GET.get('index', 'text')
+    if len( index.strip() ) == 0: 
+        index = 'text'
+    format = request.GET.get('format', None)
+    page = int( request.GET.get('page', 0) )
+    startNumZeroIndex = (ITEMS_PER_PAGE * page )
+    startNum = startNumZeroIndex + 1
+    limit = request.GET.get('limit', None)
+    browserange = request.GET.get('browserange', None)
+    if limit is not None and len(limit.strip()) > 0:
+        limits = limit.split(",,")
+    else:
+        limits = []
+    
+        
+    sort = request.GET.get('sort', None)        
+    searchString = makeSearchString( q, index, limits, sort)
+    cacheKey = "%s~%s" % (searchString, page)
+    data = cache.get( cacheKey )
+    if not data:
+        #sort facets by name vs count as per the config.py file        
+        facetsortTerm = ''
+        for f in FACETS:
+            if f['sortbycount'] == 'false':
+                facetsortTerm = facetsortTerm + '&f.%s.facet.sort=%s' % (f['code'], f['sortbycount'])
+        # end sort facets by name
+        facetURLTerm = '&facet.field='.join(facetCodes)   
+        urlToGet = "http://%s/solr/select?q=%s&wt=python&facet.field=%s%s&facet.zeros=false&facet=true&facet.limit=%s&start=%s" % ( SOLR_SERVER, searchString, facetURLTerm, facetsortTerm, MAX_FACET_TERMS_EXPANDED, startNumZeroIndex )
+        
+        try:
+            data = urllib.urlopen( urlToGet ).read()
+        except IOError:
+            raise IOError, 'Unable to connect to the Solr instance.'
+        cache.set( cacheKey, data, SEARCH_CACHE_TIME )
+    context = eval(data) 
+    context['format'] = format;
+    context['limit']=limits
+    context['searchstring']=searchString
+    context['get'] = request.META['QUERY_STRING']
+    numFound = context['response']['numFound']
+    endNum = min( numFound, ITEMS_PER_PAGE * (page + 1) )
+    context['q'] = q
+    if limit is not None: context['currentLimit'] = limit.replace('"', '%22')
+    if sort is not None: context['currentSort'] = sort
+    if index is not None: context['currentIndex'] = index
+    
     # augment item results.
-    count = 1
+    count = 0
     for record in context['response']['docs']:
-        record['count'] = count + zero_index
+        record['count'] = count + startNum
         count += 1
-        record['name'] = record.get('personal_name', []) + \
-                record.get('corporate_name', [])
-        if settings.CATALOG_RECORD_URL:
-            record['record_url'] = settings.CATALOG_RECORD_URL % record['id']
+        
+        #call number display
+
+        if LOCAL_ITEM_DISPLAY == 1:
+             # use the local facbackopac view   
+            if record.has_key('bib_num'):
+                record['full_bib_url'] = settings.BASE_URL + 'catalog/?q=%s&index=bib_num' % ('%22' + record['bib_num'] + '%22')
+                # Add the media format icons
+                if record.has_key('format'):
+                    formatIconURL = FORMAT_ICONS.get( record['format'], None)
+                    if formatIconURL: record['format_icon_url'] = formatIconURL
         else:
-            record['record_url'] = reverse('catalog-record', 
-                    args=[record['id']])
+            # Every item that we export, by definition, has a bib_num... but the
+            # field might not be indexed in the proprietary ILS
+
+            # {ckey} is the field to search for the catalog key in Unicorn
+            ckey = re.compile('\s(.*)$')
+            bib_num = ckey.search(record['bib_num']).group(1)
+            record['full_bib_url'] = OPAC_FULL_BIB_URL % (bib_num, "ckey")
+
+            # Another ILS may have to use a different field, such as the ones below
+            # Uncomment the one(s) that works for your ILS
+            # record['full_bib_url'] = OPAC_FULL_BIB_URL % (record['isbn_numeric'], "020")
+
+            #if record.has_key('ctrl_num'):
+            # record['full_bib_url'] = OPAC_FULL_BIB_URL % (record['ctrl_num'], "001")
             
+            # Add the media format icons
+            if record.has_key('format'):
+                    formatIconURL = FORMAT_ICONS.get( record['format'], None)
+                    if formatIconURL: record['format_icon_url'] = formatIconURL
         #needed for amazon book covers and isbn to be displayable
-        if 'isbn' in record:
+        if record.has_key('isbn'):
             record['isbn_numeric'] = ''.join( [ x for x in record['isbn'] if ( x.isdigit() or x.lower() == "x" ) ] )
         #make an array out of Serials Solutions Name and URL
-        if 'SSdata' in record:
+        if record.has_key('SSdata'):
             record['SSurldetails']=[]
             for items in record['SSdata']:
                 SSurlitemdetails=items.split('|')
                 record['SSurldetails'].append(SSurlitemdetails)
             
     # re-majigger facets 
-    facet_counts = context['facet_counts']
+    facetCounts = context['facet_counts']
     del context['facet_counts']
-    facet_fields = facet_counts['facet_fields']
-    facets = []   
-    for facet_option in settings.FACETS:
-        field = facet_option['field']
-        all_terms = facet_fields[field + '_facet']
-        terms = []
-        # drop terms found in limits
-        for term, count in all_terms:
-            limit = '%s:"%s"' % (field, term)
-            if limit not in limits:
-                terms.append((term, count))
-        if not terms:
-            continue
-        if len(terms) > settings.MAX_FACET_TERMS_BASIC:
-            extended_terms = terms[settings.MAX_FACET_TERMS_BASIC:]
-            terms = terms[:settings.MAX_FACET_TERMS_BASIC]
-            has_more = True
-        else:
-            extended_terms = []
-            has_more = False
-        facet = {
-            'terms': terms,
-            'extended_terms': extended_terms,
-            'field': field,
-            'name': facet_option['name'],
-            'has_more': has_more,
-        }
-        facets.append(facet)
+    _facets = []   
+
+    for facetCodeOn in allFacets:
+        facetOn = {'terms' : [], 'extended_terms' : [], 'code' : facetCodeOn['code'], 'name' : facetCodeOn['name'], 'has_more' : False }
+        if facetCounts['facet_fields'].has_key( facetCodeOn['code'] ):        
+            facetCountList = facetCounts['facet_fields'][facetCodeOn['code'] ]    # this is a list of alternating facets/counts
+            terms, counts = facetCountList[::2], facetCountList[1::2]
+            _facetOnTerms = []
+            #if the config files specifies a reverse sort, it sorts the dictionary in reverse aalphabetical order                
+            if facetCodeOn['sortbycount'] == 'reverse':
+                tempdict = {}
+                reverseterms = []
+                for i in range(len(terms)):
+                    tempdict[terms[i]] = counts[i]
+                reverseterms=reversesortDictValues(tempdict)
+                if reverseterms:
+                    for i in range(len(reverseterms)):
+                        tmp = reverseterms[i]
+                        _facetOnTerms.append( dict( term=reverseterms[i], count=tempdict[tmp]) )
+            else:
+                for i in range(len(terms)):
+                    _facetOnTerms.append( dict( term=terms[i], count=counts[i]) )
+            if len( _facetOnTerms ) > MAX_FACET_TERMS_BASIC:
+                facetOn['has_more'] = True
+                facetOn['terms'] , facetOn['extended_terms'] = _facetOnTerms[:MAX_FACET_TERMS_BASIC], _facetOnTerms[MAX_FACET_TERMS_BASIC: ]
+            else:
+                facetOn['terms'] = _facetOnTerms
+            facetOn['allterms'] = _facetOnTerms
+            facetOn['facetlocation'] = facetCodeOn['facetlocation']
+            _facets.append( facetOn )
         
     #find out if callnumlayerone is a limit and remove it from the facets 
     #dictionary if it is so that only callnumlayer2 is displayed (i.e. if 
@@ -300,98 +222,67 @@ def get_search_results(request):
     #(ie, show the 100's dewey only instead of 100's and 10's)
     if callnumlayeronefound == 1 or (callnumlayeronefound == 0 and callnumlayertwofound == 1): 
         count = 0
-        for f in facets:
-            if f['field'] == 'callnumlayerone':
-                del facets[count]
+        for f in _facets:
+            if f['code'] == 'callnumlayerone':
+                del _facets[count]
                 break
             count += 1
     
     if callnumlayeronefound == 0 or (callnumlayeronefound == 1 and callnumlayertwofound == 1): 
         count = 0
-        for f in facets:
-            if f['field'] == 'callnumlayertwo':
-                del facets[count]
+        for f in _facets:
+            if f['code'] == 'callnumlayertwo':
+                del _facets[count]
                 break
             count += 1
             
-    context['facets'] = facets
-    context['format'] = request.GET.get('format', None)
-    context['limits'] = limits
-    context['limits_param'] = limits_param
-    # limits_str for use in blocktrans 
-    limits_str = _(' and ').join(['<strong>%s</strong>' % x for x in limits]) 
-    context['limits_str'] = limits_str 
-    context['get'] = request.META['QUERY_STRING']
-    context['query'] = query
-    number_found = context['response']['numFound']
-    context['number_found'] = number_found
-    context['start_number'] = zero_index + 1
-    context['end_number'] = min(number_found, settings.ITEMS_PER_PAGE * page)
-    context['pagination'] = do_pagination(page, number_found, 
-            settings.ITEMS_PER_PAGE)
-    context['DEBUG'] = settings.DEBUG
-    if settings.DEBUG: 
-        context['solr_url'] = solr_url
-    else: 
-        # only cache for production
-        cache.set(cache_key, context, settings.SEARCH_CACHE_TIME)
+                    
+    context['facets']  = _facets
+    context['indexes'] = SEARCH_INDEXES
+    context['startNum'] = startNum
+    context['endNum'] = endNum
+    _sorts = SORTS
+    for sortOn in _sorts:
+        sortOn['selected'] = ( sort == "%s %s" % ( sortOn['field'], sortOn['direction']) )
+    context['sorts'] = _sorts
+    context['pagination'] = doPagination( page, numFound, ITEMS_PER_PAGE)
+    # put together "remove your limit" options
+    if limits:
+        _removeOptions = []
+        for limitOn in limits:
+            allOtherLimits = ",,".join( [x for x in limits if x != limitOn] )
+            _removeOptions.append( { 'label' : limitOn.replace('"', ''), 'new_limit' : allOtherLimits} )
+        context['removeLimits'] = _removeOptions
     return context
 
-def do_pagination(this_page_num, total, per_page):
-    if total % per_page:    
-        last_page_num = (total // per_page) + 1
+def reversesortDictValues(adict):
+    #sorts dictionary keys in reverse alphabetical order. Done differently before pythin 2.4 hence
+    #the version checks
+    if sys.version_info[0] >= 2 and sys.version_info[1] >= 4:
+        items = adict.keys()
+        items.sort(reverse=True)
+        return items
     else:
-        last_page_num = (total // per_page)
-    if this_page_num < 8:
-        start_page_num = 1
-    elif last_page_num - this_page_num < 7:
-        start_page_num = max(last_page_num - 10, 1)
+        items = adict.keys()
+        items.sort
+        items.reverse()
+        return items
+    
+
+def doPagination( page, totalFound, numPerPage ):
+    ret = []
+    startNum = (page * numPerPage) + 1
+    endNum = (page + 1) * numPerPage
+    if page < 5:
+        startPage = 0
     else:
-        start_page_num = this_page_num - 5
-    end_page_num = min(last_page_num, start_page_num + 10)
+        startPage = page - 5
+    if totalFound % numPerPage:    
+        lastPage = (totalFound // numPerPage) + 1
+    else:
+        lastPage = (totalFound // numPerPage)
+    endPage = min( lastPage, page + 5)
+    for i in range( startPage, endPage):
+        ret.append( { 'selected' : (i == page) , 'start' : ( i * numPerPage) + 1, 'end' : min( totalFound, ( i + 1) * numPerPage), 'page' : i, 'pageLabel' : i+1 } )
+    return {'pages' : ret , 'hasPrevious' : (page > 0), 'hasNext' : page < ( lastPage - 1 ), 'previousPage' : page-1, 'nextPage' : page+1 }
 
-    pages = []
-    for page_num in range(start_page_num, end_page_num + 1):
-        pages.append({
-            'selected': page_num == this_page_num, 
-            'start': ((page_num - 1) * per_page) + 1, 
-            'end': min(total, page_num * per_page), 
-            'number': page_num,
-        })
-
-    first_page = last_page = previous_page = next_page = None
-    if start_page_num > 1:
-        first_page = {
-            'start': 1,
-            'end': per_page,
-            'number': 1,
-        }
-    if end_page_num < last_page_num:
-        last_page = {
-            'start': ((last_page_num - 1) * per_page) + 1,
-            'end': total,
-            'number': last_page_num,
-        }
-    if this_page_num > 1:
-        previous_page_num = this_page_num - 1
-        previous_page = {
-            'start': ((previous_page_num - 1) * per_page) + 1,
-            'end': previous_page_num * per_page,
-            'number': previous_page_num,
-        }
-    if this_page_num < last_page_num:
-        next_page_num = this_page_num + 1
-        next_page = {
-            'start': ((next_page_num - 1) * per_page) + 1,
-            'end': next_page_num * per_page,
-            'number': next_page_num,
-        }
-
-    variables = {
-        'pages': pages, 
-        'previous_page': previous_page,
-        'next_page': next_page,
-        'first_page': first_page,
-        'last_page': last_page,
-    }
-    return variables

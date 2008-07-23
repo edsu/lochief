@@ -1,6 +1,5 @@
-# Copyright 2007 Casey Durfee
-# Copyright 2007 Gabriel Farrell
-#
+# Copyright (C) 2008 Gabriel Farrell
+# 
 # This file is part of Helios.
 # 
 # Helios is free software: you can redistribute it and/or modify
@@ -16,12 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls.defaults import *
+# Context processors for Helios.
 
-urlpatterns = patterns('helios.discovery.views',
-    (r'^$', 'index'),
-    (r'^search/$', 'search'),
-    (r'^feed/atom/$', 'atomFeed'),
-    (r'^feed/rss/$', 'rssFeed'),
-)
+from helios import settings
 
+def base_url(request): 
+    """Adds the base url context variable to the context.""" 
+    return {'BASE_URL': settings.BASE_URL} 

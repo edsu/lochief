@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% comment %}
+  Copyright 2007 Casey Durfee
+  Copyright 2007 Gabriel Farrell
+
+  This file is part of Helios.
+
+  Helios is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Helios is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Helios.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+{% load i18n %}
+{% block head %}
+  {% if searchstring %}
+    <link rel="alternate" type="application/atom+xml" href="/catalog/feed/atom/?{{get}}" />
+    <link rel="alternate" type="application/rss+xml" href="/catalog/feed/rss/?{{get}}" />
+  {% endif %}
+  <script type="text/javascript">
+    window.onload = setFocus;
+  </script>
+{% endblock %}
+{% block body %}
+  <div class="searchpage">
+    <span class="logo">Helios</span>
+    <form name="s" action = "{{ BASE_URL }}search/">
+      <p>
+        <label for="id_term">Search keywords:</label> <input type="text" id="id_term" name="q" size="20" maxlength="40" value="" />
+        <input type="submit" value={% trans "Search" %} class="searchbutton" />		
+      </p>
+    </form>
+  </div>
+{% endblock %}
