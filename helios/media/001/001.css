@@ -225,6 +225,9 @@ ul {
   width: 21%; 
   clear: both;
 }
+#solr-url {
+  clear: both;
+}
 #topbar { 
   clear: left;
   padding: 5px 0;
