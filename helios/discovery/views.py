@@ -26,7 +26,7 @@ import urllib
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.template.loader import get_template
 from django.utils import simplejson
@@ -90,7 +90,24 @@ def search(request):
 @vary_on_headers('accept-language', 'accept-encoding')
 def record(request, record_id):
     context = RequestContext(request)
-    id_query = 'id:%s' % record_id
+    solr_url, doc = get_record(record_id)
+    context['doc'] = doc
+    if settings.DEBUG: 
+        context['solr_url'] = solr_url
+    template = get_template('discovery/record.html')
+    return HttpResponse(template.render(context))
+
+def unapi(request):
+    context = RequestContext(request)
+    record_id = request.GET.get('id')
+    if record_id:
+        solr_url, doc = get_record(record_id)
+        context['doc'] = doc
+    template = get_template('discovery/unapi.xml')
+    return HttpResponse(template.render(context))
+
+def get_record(id):
+    id_query = 'id:%s' % id
     params = [
         ('q.alt', '*:*'),
         ('fq', id_query.encode('utf8')),
@@ -100,11 +117,7 @@ def record(request, record_id):
         doc = solr_response['response']['docs'][0]
     except IndexError:
         raise Http404
-    context['doc'] = doc
-    if settings.DEBUG: 
-        context['solr_url'] = solr_url
-    template = get_template('catalog/record.html')
-    return HttpResponse(template.render(context))
+    return (solr_url, doc)
 
 LIMITS_RE = re.compile(r"""
 (

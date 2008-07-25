@@ -20,8 +20,9 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('helios.discovery.views',
     url(r'^$', 'index', name='discovery-index'),
-    url(r'^search$', 'search', name='discovery-search'),
     url(r'^record/(\w+)$', 'record', name='discovery-record'),
+    url(r'^search$', 'search', name='discovery-search'),
+    url(r'^unapi$', 'unapi', name='discovery-unapi'),
     #(r'^feed/atom/$', 'atomFeed'),
     #(r'^feed/rss/$', 'rssFeed'),
 )
