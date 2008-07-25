@@ -87,6 +87,25 @@ def search(request):
     template = get_template('discovery/search.html')
     return HttpResponse(template.render(context))
 
+@vary_on_headers('accept-language', 'accept-encoding')
+def record(request, record_id):
+    context = RequestContext(request)
+    id_query = 'id:%s' % record_id
+    params = [
+        ('q.alt', '*:*'),
+        ('fq', id_query.encode('utf8')),
+    ]
+    solr_url, solr_response = get_solr_response(params)
+    try:
+        doc = solr_response['response']['docs'][0]
+    except IndexError:
+        raise Http404
+    context['doc'] = doc
+    if settings.DEBUG: 
+        context['solr_url'] = solr_url
+    template = get_template('catalog/record.html')
+    return HttpResponse(template.render(context))
+
 LIMITS_RE = re.compile(r"""
 (
   [+-]?      # grab an optional + or -
@@ -238,7 +257,7 @@ def get_search_results(request):
         if settings.CATALOG_RECORD_URL:
             record['record_url'] = settings.CATALOG_RECORD_URL % record['id']
         else:
-            record['record_url'] = reverse('catalog-record', 
+            record['record_url'] = reverse('discovery-record', 
                     args=[record['id']])
             
         #needed for amazon book covers and isbn to be displayable

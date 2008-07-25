@@ -1,5 +1,4 @@
-# Copyright 2007 Casey Durfee
-# Copyright 2007 Gabriel Farrell
+# Copyright 2008 Gabriel Sean Farrell
 #
 # This file is part of Helios.
 # 
@@ -16,17 +15,4 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf import settings
-from django.conf.urls.defaults import *
-
-urlpatterns = patterns('',
-    #url(r'^cataloging/', include('helios.cataloging.urls')),
-    url(r'', include('helios.discovery.urls')),
-)
-
-if settings.DEBUG:
-    urlpatterns += patterns('', 
-        url(r'^media/(?P<path>.*)$', 'django.views.static.serve', 
-            {'document_root': settings.MEDIA_ROOT}),
-    )
-
+# Future home of cataloging views.
