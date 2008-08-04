@@ -72,7 +72,7 @@ FIELDNAMES = [
     'url',
 ]
 
-def write_csv(marc_file_handle, csv_file_handle):
+def write_csv(marc_file_handle, csv_file_handle, ils=ILS):
     """
     Convert a MARC dump file to a CSV file.
     """
@@ -95,7 +95,7 @@ def write_csv(marc_file_handle, csv_file_handle):
         for marc_record in reader:
             count += 1
             try:
-                record = get_record(marc_record, ils=ILS)
+                record = get_record(marc_record, ils=ils)
                 if record:  # skip when get_record returns None
                     row = get_row(record)
                     writer.writerow(row)
@@ -121,8 +121,12 @@ def write_json(marc_file_handle, json_directory):
     pass
 
 if __name__ == '__main__':
+    ils_choices = ('', 'III', 'Unicorn', 'Horizon')
     usage = "usage: %prog [options] FILE_OR_URL"
     parser = optparse.OptionParser(usage=usage)
+    parser.add_option('-i', '--ils', dest='ils', metavar='ILS', 
+        help='ILS the MARC was exported from', choices=ils_choices, 
+        default=ILS)
     parser.add_option('-o', '--output', dest='out_file', metavar='OUT_FILE', 
         help='output the CSV to OUT_FILE instead of loading it into a SOLR instance')
     parser.add_option('-s', '--solr', dest='solr', metavar='SOLR_URL', 
@@ -138,7 +142,7 @@ if __name__ == '__main__':
         csv_handle = open(csv_file, 'w')
         print "Converting %s to CSV ..." % file_or_url
         t1 = time.time()
-        record_count = write_csv(in_handle, csv_handle)
+        record_count = write_csv(in_handle, csv_handle, ils=options.ils)
         t2 = time.time()
         if not options.out_file:
             csv_index.load_solr(csv_file, options.solr)
