@@ -109,7 +109,7 @@ ul {
   clear: left; /* for ie7 */
   float: left;
   padding: 10px;
-  width: 100%; /* for ie7 */
+  width: 98%; /* for ie7 */
   border: 1px solid #ddd;
   margin: 10px 0;
 }
@@ -170,7 +170,7 @@ ul {
 }
 #results { 
   margin-left: 5px;
-  margin-right: 27%;
+  margin-right: 25%;
 }
 #searchform { 
   white-space: nowrap;
