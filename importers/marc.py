@@ -19,13 +19,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Converts MARC data to CSV for feeding to SOLR."""
+"""Processes MARC data for importing."""
 
-import os
-import sys
-import re
 import csv
+import optparse
+import os
 import pymarc
+import re
+import sys
+import time
+import urllib
 #import unicodedata
 
 try:
@@ -34,7 +37,7 @@ except NameError:
     from sets import Set as set
 
 ## local libs
-from lib.util import marc_maps
+from util import csv_index, marc_maps
 
 ILS = '' # Horizon, III, or Unicorn for specific record ID handling
 
@@ -191,6 +194,25 @@ def id_match(id_fields, id_re):
                 id_list.append(id)
     return id_list
 
+def get_languages(language_codes):
+    split_codes = []
+    for code in language_codes:
+        code = code.lower()
+        if len(code) > 3:
+            split_code = [code[k:k+3] for k in range(0, len(code), 3)]
+            split_codes.extend(split_code)
+        else:
+            split_codes.append(code)
+    languages = []
+    for code in split_codes:
+        try:
+            language = marc_maps.LANGUAGE_CODING_MAP[code]
+        except KeyError:
+            language = None
+        if language:
+            languages.append(language)
+    return set(languages)
+
 # Roles with names (i.e. "Glover, Crispin (Actor)") looks neat but is
 # kind of useless from a searching point of view.  A search for "Law,
 # Jude (Actor)" won't return plain old "Law, Jude".  I welcome other
@@ -207,15 +229,15 @@ def id_match(id_fields, id_re):
 #                pass
 #    return name
         
-def create_row(record, count, ils=None):
+def get_row(record, count, ils=None):
     """
-    Pulls the fields from a MARCReader record into a list for the CSV writer.
+    Pulls the fields from a MARCReader record into a dictionary.
     >>> marc_file_handle = open('test/marc.dat')
     >>> reader = pymarc.MARCReader(marc_file_handle)
     >>> count = 0
     >>> for record in reader:
     ...     count += 1
-    ...     row = create_row(record, count)
+    ...     row = get_row(record, count)
     ...     print row['author']
     ...     break
     ...
@@ -303,25 +325,6 @@ def create_row(record, count, ils=None):
         
     upc_fields = record.get_fields('024')
     row['upc'] = id_match(upc_fields, UPC_RE)
-
-    def get_languages(language_codes):
-        split_codes = []
-        for code in language_codes:
-            code = code.lower()
-            if len(code) > 3:
-                split_code = [code[k:k+3] for k in range(0, len(code), 3)]
-                split_codes.extend(split_code)
-            else:
-                split_codes.append(code)
-        languages = []
-        for code in split_codes:
-            try:
-                language = marc_maps.LANGUAGE_CODING_MAP[code]
-            except KeyError:
-                language = None
-            if language:
-                languages.append(language)
-        return set(languages)
 
     if record['041']:
         language_dubbed_codes = record['041'].get_subfields('a')
@@ -422,7 +425,7 @@ def create_row(record, count, ils=None):
 
 def write_csv(marc_file_handle, csv_file_handle):
     """
-    Convert a MARC file to a CSV file.
+    Convert a MARC dump file to a CSV file.
     """
     # This doctest commented out until field names are stable.
     #>>> write_csv('test/marc.dat', 'test/records.csv')
@@ -442,12 +445,12 @@ def write_csv(marc_file_handle, csv_file_handle):
         writer.writerow(fieldname_dict)
         for record in reader:
             try:
-                row = create_row(record, count, ils=ILS)
-                if row:  # skip when create_row returns None
+                row = get_row(record, count, ils=ILS)
+                if row:  # skip when get_record returns None
                     count += 1
                     writer.writerow(row)
             except:
-                sys.stderr.write("\nError in record #%s (%s):\n" % (count, 
+                sys.stderr.write("\nError in MARC record #%s (%s):\n" % (count, 
                         record.title()))
                 raise
             else:
@@ -460,3 +463,43 @@ def write_csv(marc_file_handle, csv_file_handle):
         csv_file_handle.close()
     sys.stderr.write("\nProcessed %s records.\n" % count)
     return count
+
+def write_json(marc_file_handle, json_directory):
+    """
+    Convert a MARC dump file to a bunch of JSON files.
+    """
+    pass
+
+if __name__ == '__main__':
+    usage = "usage: %prog [options] FILE_OR_URL"
+    parser = optparse.OptionParser(usage=usage)
+    parser.add_option('-o', '--output', dest='out_file', metavar='OUT_FILE', 
+        help='output the CSV to OUT_FILE instead of loading it into a SOLR instance')
+    parser.add_option('-s', '--solr', dest='solr', metavar='SOLR_URL', 
+        help='URL for Solr, defaults to %s' % csv_index.SOLR_URL, 
+        default=csv_index.SOLR_URL)
+    options, args = parser.parse_args()
+    if len(args) != 1:
+        parser.print_help()
+    else:
+        file_or_url = args[0]
+        in_handle = urllib.urlopen(file_or_url)
+        csv_file = options.out_file or 'tmp.csv'
+        csv_handle = open(csv_file, 'w')
+        print "Converting %s to CSV ..." % file_or_url
+        t1 = time.time()
+        record_count = write_csv(in_handle, csv_handle)
+        t2 = time.time()
+        if not options.out_file:
+            csv_index.load_solr(csv_file, options.solr)
+        t3 = time.time()
+        p_time = (t2 - t1) / 60
+        l_time = (t3 - t2) / 60
+        t_time = p_time + l_time
+        rate = record_count / (t3 - t1)
+        print """Processing took %0.3f minutes.
+Loading took %0.3f minutes.  
+That's %0.3f minutes total for %d records, 
+at a rate of %0.3f records per second.
+""" % (p_time, l_time, t_time, record_count, rate)
+
