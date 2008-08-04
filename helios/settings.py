@@ -229,7 +229,7 @@ FACETS = [
 #    },
 ]
 
-ITEMS_PER_PAGE = 10
+ITEMS_PER_PAGE = 20
 
 # Sort options for results, by (DISPLAY, SOLR_PARAM).
 SORTS = (
