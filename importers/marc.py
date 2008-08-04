@@ -37,7 +37,7 @@ except NameError:
     from sets import Set as set
 
 ## local libs
-from util import csv_index, marc_maps
+from lib import csv_index, marc_maps
 
 ILS = '' # Horizon, III, or Unicorn for specific record ID handling
 
