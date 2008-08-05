@@ -123,4 +123,7 @@
       </div>
     </div>
   </div>    
+  {% if DEBUG %}
+    <div id="solr-url"><a href="{{ solr_url }}">Solr URL</a></div>
+  {% endif %}
 {% endblock %}

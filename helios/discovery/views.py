@@ -92,8 +92,8 @@ def record(request, record_id):
     context = RequestContext(request)
     solr_url, doc = get_record(record_id)
     context['doc'] = doc
-    if settings.DEBUG: 
-        context['solr_url'] = solr_url
+    context['DEBUG'] = settings.DEBUG
+    context['solr_url'] = solr_url
     template = get_template('discovery/record.html')
     return HttpResponse(template.render(context))
 
@@ -362,9 +362,8 @@ def get_search_results(request):
     context['pagination'] = do_pagination(page, number_found, 
             settings.ITEMS_PER_PAGE)
     context['DEBUG'] = settings.DEBUG
-    if settings.DEBUG: 
-        context['solr_url'] = solr_url
-    else: 
+    context['solr_url'] = solr_url
+    if not settings.DEBUG: 
         # only cache for production
         cache.set(cache_key, context, settings.SEARCH_CACHE_TIME)
     return context
