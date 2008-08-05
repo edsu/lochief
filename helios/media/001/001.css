@@ -207,9 +207,9 @@ ul {
   margin: 40px 0 10px 10px;
   font-size: 110%;
 }
-#noresults {
-  clear: both;
-  margin: 30px;
+#no-results {
+  clear: left;
+  margin: 30px 25% 20px 5px;
 }
 #searchpage #logo {
   margin: auto;

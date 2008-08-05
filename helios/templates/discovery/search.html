@@ -192,11 +192,11 @@
                   {% endfor %}
                 </div>
               {% endif %}
-              {% if doc.topic %}
-                <div class="topics">
-                  <span class="metadata">{% trans "Topics:" %}</span>
-                  {% for topic in doc.topic %}
-                    <a href="{% new_limit "topic" topic %}" title="{% trans "Search for" %} {{ topic }}">{{ topic }}</a>
+              {% if doc.subject %}
+                <div class="subjects">
+                  <span class="metadata">{% trans "Subjects:" %}</span>
+                  {% for subject in doc.subject %}
+                    <a href="{% new_limit "subject" subject %}" title="{% trans "Search for" %} {{ subject }}">{{ subject }}</a>
                   {% endfor %}
                 </div>
               {% endif %}
@@ -276,7 +276,18 @@
       {% endif %}
     </div>
   {% else %}
-    <div id="noresults">Your search for <strong>{{ query }}</strong> returned no results.  Please try another search.</div>
+    <div id="no-results">
+      <span>{% trans "Your search for" %}</span>
+      {% if query %}
+        <strong>{{ query }}</strong>
+      {% else %}
+        <span>{% trans "everything" %}</span>
+      {% endif %}
+      {% if limits_str %}
+        {% trans "with" %} {{ limits_str|safe }}
+      {% endif %} 
+      <span>{% trans "returned no results.  Please try another search." %}</span>
+    </div>
   {% endif %}
   {% if DEBUG %}
     <div id="solr-url"><a href="{{ solr_url }}">Solr URL</a></div>

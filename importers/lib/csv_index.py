@@ -31,6 +31,7 @@ MULTIVALUE_FIELDNAMES = [
     'language_dubbed',
     'language',
     'language_subtitles',
+    'notes',
     'personal_name',
     'place',
     'position',

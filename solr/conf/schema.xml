@@ -89,7 +89,7 @@
     <dynamicField name="*_facet" type="string" indexed="true" stored="false" multiValued="true"/>
     <field name="LCClass" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="SSdata" type="string" indexed="false" stored="true" multiValued="true" />
-    <field name="audience" type="string" indexed="true" stored="true" />
+    <field name="audience" type="textTighter" indexed="true" stored="true" />
     <field name="author" type="textTighter" indexed="true" stored="true" multiValued="true" />
     <field name="availability" type="string" indexed="true" stored="true" multiValued="false" />
     <field name="barcode" type="string" indexed="true" stored="true" multiValued="true" />
@@ -118,7 +118,7 @@
     <field name="location" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="marc_record" type="string" indexed="false" stored="true" multiValued="false" />
     <field name="name" type="textTighter" indexed="true" stored="true" multiValued="true" />
-    <field name="notes" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="notes" type="string" stored="true" multiValued="true" />
     <field name="oclc_num" type="string" indexed="true" stored="true" />
     <field name="performer" type="textTighter" indexed="true" stored="true" multiValued="true" />
     <field name="personal_name" type="textTighter" indexed="true" stored="true" multiValued="true" />
@@ -135,7 +135,7 @@
     <field name="subjectentity" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="subjectname" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="subtitles" type="textTighter" indexed="true" stored="false" multiValued="true" />    
-    <field name="summary" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="summary" type="string" stored="true" multiValued="true" />
     <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
     <field name="title" type="textTighter" indexed="true" stored="true" />
     <field name="title_sort" type="sorting" indexed="true" stored="true" />
@@ -147,6 +147,7 @@
   <uniqueKey>id</uniqueKey>
   <defaultSearchField>text</defaultSearchField>
   <solrQueryParser defaultOperator="AND"/>
+  <copyField source="audience" dest="audience_facet" />
   <copyField source="author" dest="author_facet" />
   <copyField source="author" dest="text"/>
   <copyField source="contents" dest="text" />
@@ -157,6 +158,7 @@
   <copyField source="format" dest="format_facet"/>
   <copyField source="genre" dest="genre_facet" />
   <copyField source="genre" dest="subject" />
+  <copyField source="genre" dest="subject_facet"/>
   <copyField source="genre" dest="text" />  
   <copyField source="isbn" dest="text" />
   <copyField source="issn" dest="text" />
@@ -172,6 +174,7 @@
   <copyField source="personal_name" dest="personal_name_facet" />
   <copyField source="personal_name" dest="text" />
   <copyField source="place" dest="subject"/>
+  <copyField source="place" dest="subject_facet"/>
   <copyField source="place" dest="place_facet"/>
   <copyField source="place" dest="text"/>
   <copyField source="position" dest="position_facet"/>
@@ -188,6 +191,7 @@
   <copyField source="summary" dest="text"/> 
   <copyField source="full_title" dest="text"/>
   <copyField source="topic" dest="subject"/>
+  <copyField source="topic" dest="subject_facet"/>
   <copyField source="topic" dest="text"/>
   <copyField source="topic" dest="topic_facet"/>
   <copyField source="url" dest="text" />

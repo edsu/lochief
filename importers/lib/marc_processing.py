@@ -321,12 +321,15 @@ def get_record(marc_record, ils=None):
 
     series_fields = marc_record.get_fields('440', '490')
     record['series'] = multi_field_list(series_fields, 'a')
+
+    notes_fields = marc_record.get_fields('500')
+    record['notes'] = [field.value() for field in notes_fields]
     
     contents_fields = marc_record.get_fields('505')
     record['contents'] = multi_field_list(contents_fields, 'a')
     
     summary_fields = marc_record.get_fields('520')
-    record['summary'] = multi_field_list(summary_fields, 'ab')
+    record['summary'] = [field.value() for field in summary_fields]
     
     subjname_fields = marc_record.get_fields('600')
     subjectnames = multi_field_list(subjname_fields, 'a')
