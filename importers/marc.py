@@ -38,40 +38,9 @@ except NameError:
 
 ## local libs
 from lib import csv_index
-from lib.marc_processing import get_record, get_row
+from lib import marc_processing as mp
 
 ILS = '' # Horizon, III, or Unicorn for specific record ID handling
-
-FIELDNAMES = [
-    'audience',
-    'author',
-    'bib_num',
-    'contents',
-    'corporate_name',
-    'ctrl_num',
-    'format',
-    'full_title',
-    'genre',
-    'id',
-    'imprint',
-    'isbn',
-    'language',
-    'language_dubbed', 
-    'language_subtitles',
-    'oclc_num',
-    'notes',
-    'personal_name',
-    'place',
-    'publisher',
-    'pubyear',
-    'series',
-    'summary',
-    'title',
-    'title_sort',
-    'topic',
-    'upc',
-    'url',
-]
 
 def write_csv(marc_file_handle, csv_file_handle, ils=ILS):
     """
@@ -86,19 +55,19 @@ def write_csv(marc_file_handle, csv_file_handle, ils=ILS):
     #>>> os.remove('test/records.csv')
     reader = pymarc.MARCReader(marc_file_handle)
     fieldname_dict = {}
-    for fieldname in FIELDNAMES:
+    for fieldname in mp.FIELDNAMES:
         fieldname_dict[fieldname] = fieldname
     #for record in reader
     count = 0
     try:
-        writer = csv.DictWriter(csv_file_handle, FIELDNAMES)
+        writer = csv.DictWriter(csv_file_handle, mp.FIELDNAMES)
         writer.writerow(fieldname_dict)
         for marc_record in reader:
             count += 1
             try:
-                record = get_record(marc_record, ils=ils)
+                record = mp.get_record(marc_record, ils=ils)
                 if record:  # skip when get_record returns None
-                    row = get_row(record)
+                    row = mp.get_row(record)
                     writer.writerow(row)
             except:
                 sys.stderr.write("\nError in MARC record #%s (%s):\n" % (count, 

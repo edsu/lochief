@@ -34,6 +34,36 @@ import marc_maps
 NONINT_RE = re.compile(r'\D')
 ISBN_RE = re.compile(r'(\b\d{10}\b|\b\d{13}\b)')
 UPC_RE = re.compile(r'\b\d{12}\b')
+FIELDNAMES = [
+    'audience',
+    'author',
+    'bib_num',
+    'contents',
+    'corporate_name',
+    'ctrl_num',
+    'format',
+    'full_title',
+    'genre',
+    'id',
+    'imprint',
+    'isbn',
+    'language',
+    'language_dubbed', 
+    'language_subtitles',
+    'oclc_num',
+    'notes',
+    'personal_name',
+    'place',
+    'publisher',
+    'pubyear',
+    'series',
+    'summary',
+    'title',
+    'title_sort',
+    'topic',
+    'upc',
+    'url',
+]
 
 class RowDict(dict):
     """
@@ -53,7 +83,8 @@ class RowDict(dict):
             return ''
         if hasattr(value, '__iter__'):
             value = '|'.join([x for x in value if x])
-        return pymarc.marc8.marc8_to_unicode(value).encode('utf8')
+        #return pymarc.marc8.marc8_to_unicode(value).encode('utf8')
+        return value  # assume it's already in utf8 for now
 
 def normalize(value):
     if value:
