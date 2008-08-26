@@ -27,8 +27,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
-from django.template import RequestContext
-from django.template.loader import get_template
+from django.template import loader, RequestContext
 from django.utils import simplejson
 from django.utils.encoding import iri_to_uri
 from django.utils.http import urlquote
@@ -72,7 +71,7 @@ def index(request):
         facets.append(facet)
     context['facets'] = facets
     context['INDEX_FACET_TERMS'] = settings.INDEX_FACET_TERMS
-    template = get_template('discovery/index.html')
+    template = loader.get_template('discovery/index.html')
     response = HttpResponse(template.render(context))
     if not settings.DEBUG:
         cache.set(cache_key, response)
@@ -84,7 +83,7 @@ def search(request):
     context.update(get_search_results(request))
     context['ILS'] = settings.ILS
     context['MAJAX_URL'] = settings.MAJAX_URL
-    template = get_template('discovery/search.html')
+    template = loader.get_template('discovery/search.html')
     return HttpResponse(template.render(context))
 
 @vary_on_headers('accept-language', 'accept-encoding')
@@ -94,7 +93,21 @@ def record(request, record_id):
     context['doc'] = doc
     context['DEBUG'] = settings.DEBUG
     context['solr_url'] = solr_url
-    template = get_template('discovery/record.html')
+    base_params = [
+        ('rows', 0),
+        ('q.alt', '*:*'),
+    ]
+    subject_terms = []
+    for subject in doc['subject']:
+        params = base_params[:]
+        params.append(('fq', 'subject_facet:"%s"' % subject))
+        solr_url, solr_response = get_solr_response(params)
+        subject_terms.append((solr_response['response']['numFound'], subject))
+    subject_terms.sort()
+    subject_terms.reverse()
+    subject_terms = [(x[1], x[0]) for x in subject_terms]
+    context['subject_terms'] = subject_terms
+    template = loader.get_template('discovery/record.html')
     return HttpResponse(template.render(context))
 
 def unapi(request):
@@ -103,7 +116,7 @@ def unapi(request):
     if record_id:
         solr_url, doc = get_record(record_id)
         context['doc'] = doc
-    template = get_template('discovery/unapi.xml')
+    template = loader.get_template('discovery/unapi.xml')
     return HttpResponse(template.render(context))
 
 def get_record(id):

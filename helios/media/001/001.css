@@ -48,9 +48,6 @@ ul {
 .facet-list { 
   margin-bottom: 5px;
 }
-.facet-list li { 
-  color: #555;
-}
 .format {
   float: left;
   padding: 0 5px 0 0;
@@ -138,7 +135,7 @@ ul {
   background-color: #D2DFF4; 
   border: 1px solid #88a0c6; 
   padding: 5px;
-  margin-bottom: 5px;
+  margin: 10px 0;
 }
 #facets h3 {  
   margin: 0 0 3px 0;
@@ -224,6 +221,9 @@ ul {
   padding: 0 5px;
   width: 21%; 
   clear: both;
+}
+#sidebar li { 
+  color: #555;
 }
 #solr-url {
   clear: both;
