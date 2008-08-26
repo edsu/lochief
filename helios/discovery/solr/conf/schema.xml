@@ -102,6 +102,7 @@
     <field name="copyinfo" type="text_ws" indexed="true" stored="true" multiValued="true" />
     <field name="corporate_name" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="ctrl_num" type="string" indexed="true" stored="true" />
+    <field name="description" type="string" stored="true" multiValued="true" />
     <field name="deweyClass" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="dubbed" type="textTighter" indexed="true" stored="false" multiValued="true" />    
     <field name="email" type="textTighter" indexed="true" stored="true" multiValued="true" />    

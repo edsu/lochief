@@ -41,6 +41,7 @@ FIELDNAMES = [
     'contents',
     'corporate_name',
     'ctrl_num',
+    'description',
     'format',
     'full_title',
     'genre',
@@ -325,6 +326,8 @@ def get_record(marc_record, ils=None):
         if languages_subtitles:
             record['language_subtitles'] = languages_subtitles
 
+    record['author'] = marc_record.author()
+
     # are there any subfields we don't want for the full_title?
     if marc_record['245']:
         full_title = marc_record['245'].format_field()
@@ -347,9 +350,10 @@ def get_record(marc_record, ils=None):
         #    date_find = DATE_RE.search(marc_record['260']['c'])
         #    if date_find:
         #        record['date'] = date_find.group()
-    
-    record['author'] = marc_record.author()
 
+    description_fields = marc_record.get_fields('300')
+    record['description'] = [field.value() for field in description_fields]
+    
     series_fields = marc_record.get_fields('440', '490')
     record['series'] = multi_field_list(series_fields, 'a')
 
