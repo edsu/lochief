@@ -25,6 +25,7 @@
 {% endblock %}
 {% block head %}
   <meta name="robots" content="noindex"/>
+  <link rel="unapi-server" type="application/xml" title="unAPI" href="{% url discovery-unapi %}"/>
   <!--
   <link rel="alternate" type="application/atom+xml" href="/feed/atom/?{{ get }}" />
   <link rel="alternate" type="application/rss+xml" href="/feed/rss/?{{ get }}" />
@@ -166,6 +167,7 @@
       <ol>
         {% for doc in response.docs %}
           <li class="record">
+            <abbr class="unapi-id" title="{{ doc.id }}"></abbr>
             <div class="cover">
               <a href="{{ doc.record_url }}">
                 {% if doc.upc %}

@@ -20,6 +20,9 @@
 {% load i18n %}
 {% load discovery_extras %}
 {% block title %} | {{ doc.title }}{% endblock %}
+{% block head %}
+  <link rel="unapi-server" type="application/xml" title="unAPI" href="{% url discovery-unapi %}"/>
+{% endblock %}
 {% block body %}
   <div id="sidebar">
     <div id="suggested">
@@ -33,6 +36,7 @@
   </div>
   <div id="results">
     <div class="record">
+      <abbr class="unapi-id" title="{{ doc.id }}"></abbr>
       <div class="cover">
         <a href="{{ doc.record_url }}">
           {% if doc.upc %}

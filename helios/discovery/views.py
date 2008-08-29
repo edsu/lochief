@@ -112,12 +112,61 @@ def record(request, record_id):
 
 def unapi(request):
     context = RequestContext(request)
-    record_id = request.GET.get('id')
-    if record_id:
-        solr_url, doc = get_record(record_id)
-        context['doc'] = doc
+    identifier = request.GET.get('id')
+    format = request.GET.get('format')
+    if identifier and format:
+        solr_url, doc = get_record(identifier)
+        if format == 'oai_dc':
+            # we'll include test for record_type when we have 
+            # different types of records 
+            #if doc['record_type'] == 'book':  
+            element_map = {
+                'identifier': ['isbn', 'upc'], 
+                'title': ['title'], 
+                'publisher': ['publisher'],
+                'language': ['language'],
+                'description': ['description'],
+                'subject': ['subject'],
+                'date': ['year'],
+                'contributor': ['name'],
+                'format': ['format'],
+            }
+            elements = []
+            for name in element_map:
+                elements.extend(get_elements(name, element_map[name], doc))
+            context['elements'] = elements
+            template = loader.get_template('discovery/unapi-oai_dc.xml')
+            return HttpResponse(template.render(context), 
+                    mimetype='application/xml')
+        if format == 'mods':
+            context['doc'] = doc
+            template = loader.get_template('discovery/unapi-mods.xml')
+            return HttpResponse(template.render(context), 
+                    mimetype='application/xml')
+        else:
+            raise Http404 # should be 406 -- see http://unapi.info/specs/
+    if identifier:
+        pass
     template = loader.get_template('discovery/unapi.xml')
-    return HttpResponse(template.render(context))
+    return HttpResponse(template.render(context), mimetype='application/xml')
+
+def get_elements(name, fields, doc):
+    elements = []
+    for field in fields:
+        if field in doc:
+            field_values = doc[field]
+            if not hasattr(field_values, '__iter__'):
+                field_values = [field_values]
+            for value in field_values:
+                element = {'name': name, 'terms': []}
+                if field == 'isbn':
+                    element['terms'].append('ISBN:%s' % value)
+                elif field == 'upc':
+                    element['terms'].append('UPC:%s' % value)
+                else:
+                    element['terms'].append(value)
+                elements.append(element)
+    return elements
 
 def get_record(id):
     id_query = 'id:%s' % id

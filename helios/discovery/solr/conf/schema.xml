@@ -113,7 +113,7 @@
     <field name="imprint" type="string" indexed="false" stored="true" />
     <field name="isbn" type="string" indexed="true" stored="true" multiValued="true" />
     <field name="issn" type="string" indexed="true" stored="true" />
-    <field name="language" type="textTighter" indexed="true" stored="false" multiValued="true" />    
+    <field name="language" type="textTighter" indexed="true" stored="true" multiValued="true" />    
     <field name="language_dubbed" type="textTighter" indexed="true" stored="false" multiValued="true" />    
     <field name="language_subtitles" type="textTighter" indexed="true" stored="false" multiValued="true" />    
     <field name="location" type="string" indexed="true" stored="true" multiValued="true" />
