@@ -126,7 +126,7 @@ if __name__ == '__main__':
                 try:
                     for line in in_handle:
                         record_count += 1
-                        csv_handle.write()
+                        csv_handle.write(line)
                 finally:
                     in_handle.close()
                     csv_handle.close()
