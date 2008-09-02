@@ -19,38 +19,36 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Imports CSV data into a Solr instance."""
+"""Indexes documents in a Solr instance."""
 
 import os
 import optparse
 import time
 import urllib
 
+try:
+    from xml.etree import ElementTree as et  # builtin in Python 2.5
+except ImportError:
+    import elementtree.ElementTree as et
+
+## settings from local Helios
+from helios import settings
+
 ## local libraries
-#import lib
+import lib
 
-SOLR_URL = 'http://localhost:8983/solr/update/csv?%s'
+SOLR_SCHEMA = 'solr/conf/schema.xml'
 
-MULTIVALUE_FIELDNAMES = [
-    'contents',
-    'corporate_name',
-    'genre',
-    'isbn',
-    'language_dubbed',
-    'language',
-    'language_subtitles',
-    'personal_name',
-    'place',
-    'position',
-    'series',
-    'summary',
-    'topic',
-    'url',
-]
-
-# summary causes an error in solr pre 2008/01/08 dev (for my data, at
-# least -- gsf) -- see 
-# http://mail-archives.apache.org/mod_mbox/lucene-solr-user/200801.mbox/%3cc68e39170801081009r18b024f9g4076a6333455463e@mail.gmail.com%3e
+def get_multi(solr_schema):
+    """Inspect solr schema.xml for multivalue fields."""
+    multivalue_fieldnames = []
+    schema = et.parse(solr_schema)
+    fields_element = schema.find('fields')
+    field_elements = fields_element.findall('field')
+    for field in field_elements:
+        if field.get('multiValued') == 'true':
+            multivalue_fieldnames.append(field.get('name'))
+    return multivalue_fieldnames
 
 def load_solr(csv_file, solr_url):
     """
@@ -59,7 +57,7 @@ def load_solr(csv_file, solr_url):
     """
     file_path = os.path.abspath(csv_file)
     solr_params = {}
-    for fieldname in MULTIVALUE_FIELDNAMES:
+    for fieldname in get_multi(SOLR_SCHEMA):
         tag_split = "f.%s.split" % fieldname
         solr_params[tag_split] = 'true'
         tag_separator = "f.%s.separator" % fieldname
@@ -67,23 +65,35 @@ def load_solr(csv_file, solr_url):
     solr_params['stream.file'] = file_path
     solr_params['commit'] = 'true'
     params = urllib.urlencode(solr_params)
+    solr_url = solr_url + 'update/csv?%s'
     print "Loading records into Solr ..."
     try: 
         output = urllib.urlopen(solr_url % params)
     except IOError:
         raise IOError, 'Unable to connect to the Solr instance.'
+    print "Solr response:\n"
     print output.read()
 
 if __name__ == '__main__':
     usage = "usage: %prog [options] FILE_OR_URL"
     parser = optparse.OptionParser(usage=usage)
+    ils_choices = ('', 'III', 'Unicorn', 'Horizon')
+    if settings.ILS:
+        ils_default = ', defaults to "%s"' % settings.ILS
+    else:
+        ils_default = ''
+    parser.add_option('-i', '--ils', dest='ils', metavar='ILS', 
+        help='ILS the MARC was exported from' + ils_default, 
+        choices=ils_choices, 
+        default=settings.ILS)
     parser.add_option('-o', '--output', dest='out_file', metavar='OUT_FILE', 
         help='output the CSV to OUT_FILE instead of loading it into a SOLR instance')
     parser.add_option('-p', '--parsing_module', dest='parsing_module', 
         metavar='PARSING_MODULE', 
-        help='use PARSING_MODULE to parse FILE_OR_URL and convert to CSV')
+        help='use PARSING_MODULE (relative path to the module) to parse FILE_OR_URL and convert to CSV')
     parser.add_option('-s', '--solr', dest='solr', metavar='SOLR_URL', 
-        help='URL for Solr, defaults to %s' % SOLR_URL, default=SOLR_URL)
+        help='URL for Solr, defaults to "%s"' % settings.SOLR_URL, 
+        default=settings.SOLR_URL)
     options, args = parser.parse_args()
     if len(args) != 1:
         parser.print_help()
@@ -101,12 +111,12 @@ if __name__ == '__main__':
             module = __import__(mod_path, fromlist=[''])
             print "Converting %s to CSV ..." % file_or_url
             record_count = module.write_csv(in_handle, csv_handle)
-        else:
+        else:  # load csv directly
+            record_count = -1  # start at -1 to account for fieldnames
             if file_or_url == csv_file:
                 # check for equality here stops us from overwriting csv_file
                 # if we're loading it again
                 try:
-                    record_count = -1  # start at -1 to account for fieldnames
                     for line in in_handle:
                         record_count += 1
                 finally:
@@ -114,7 +124,6 @@ if __name__ == '__main__':
             else:
                 csv_handle = open(csv_file, 'w')
                 try:
-                    record_count = -1
                     for line in in_handle:
                         record_count += 1
                         csv_handle.write()

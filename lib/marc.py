@@ -20,8 +20,10 @@
 
 """Helpers for MARC processing."""
 
+import csv
 import pymarc
 import re
+import sys
 
 try:
     set
@@ -29,7 +31,7 @@ except NameError:
     from sets import Set as set
 
 # local libs
-import marc_maps
+from lib import marc_maps
 
 NONINT_RE = re.compile(r'\D')
 ISBN_RE = re.compile(r'(\b\d{10}\b|\b\d{13}\b)')
@@ -421,3 +423,46 @@ def get_row(record):
     """Converts record dict to row for CSV input."""
     row = RowDict(record)
     return row
+
+def write_csv(marc_file_handle, csv_file_handle, ils=None):
+    """
+    Convert a MARC dump file to a CSV file.
+    """
+    # This doctest commented out until field names are stable.
+    #>>> write_csv('test/marc.dat', 'test/records.csv')
+    #>>> csv_records = open('test/records.csv').read()
+    #>>> csv_measure = open('test/measure.csv').read()
+    #>>> csv_records == csv_measure
+    #True
+    #>>> os.remove('test/records.csv')
+    reader = pymarc.MARCReader(marc_file_handle)
+    fieldname_dict = {}
+    for fieldname in FIELDNAMES:
+        fieldname_dict[fieldname] = fieldname
+    #for record in reader
+    count = 0
+    try:
+        writer = csv.DictWriter(csv_file_handle, FIELDNAMES)
+        writer.writerow(fieldname_dict)
+        for marc_record in reader:
+            count += 1
+            try:
+                record = get_record(marc_record, ils=ils)
+                if record:  # skip when get_record returns None
+                    row = get_row(record)
+                    writer.writerow(row)
+            except:
+                sys.stderr.write("\nError in MARC record #%s (%s):\n" % (count, 
+                        marc_record.title()))
+                raise
+            else:
+                if count % 1000:
+                    sys.stderr.write(".")
+                else:
+                    sys.stderr.write(str(count))
+    finally:
+        marc_file_handle.close()
+        csv_file_handle.close()
+    sys.stderr.write("\nProcessed %s records.\n" % count)
+    return count
+

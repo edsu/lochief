@@ -252,7 +252,7 @@ def get_solr_response(params):
     ]
     params.extend(default_params)
     urlparams = urllib.urlencode(params)
-    url = '%s?%s' % (settings.SOLR_URL, urlparams)
+    url = '%sselect?%s' % (settings.SOLR_URL, urlparams)
     try:
         solr_response = urllib.urlopen(url)
     except IOError:

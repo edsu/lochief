@@ -115,9 +115,9 @@ CACHE_BACKEND = 'locmem:///'
 
 ## Settings specific to this project (that is, non-Django) ##
 
-SOLR_URL = 'http://localhost:8983/solr/select/'
+SOLR_URL = 'http://localhost:8983/solr/'
 
-# "III" is the only functional choice right now
+# III, Unicorn, or Horizon -- affects both display and index/ingest
 ILS = ''
 
 # MAJAX_URL is for use with http://libx.org/majax/ 
