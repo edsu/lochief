@@ -107,8 +107,7 @@ if __name__ == '__main__':
             mod_path = options.parsing_module
             if mod_path.endswith('.py'):
                 mod_path = mod_path[:-3]
-            #mod_path = 'lib.' + options.parsing_module
-            module = __import__(mod_path, fromlist=[''])
+            module = __import__(mod_path)
             print "Converting %s to CSV ..." % file_or_url
             try:
                 record_count = module.write_csv(in_handle, csv_handle, 
