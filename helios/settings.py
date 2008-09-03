@@ -149,8 +149,8 @@ INDEX_FACETS = [
         'sort_by_count': True, 
     }, 
     { 
-        'name': ugettext('Topics'), 
-        'field': 'topic', 
+        'name': ugettext('Subjects'), 
+        'field': 'subject', 
         'sort_by_count': True, 
     },    
     { 
