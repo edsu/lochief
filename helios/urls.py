@@ -18,10 +18,14 @@
 
 from django.conf import settings
 from django.conf.urls.defaults import *
+from django.contrib import admin
+
+admin.autodiscover()
 
 urlpatterns = patterns('',
-    #url(r'^cataloging/', include('helios.cataloging.urls')),
+    #url(r'^cat/', include('helios.cataloging.urls')),
     url(r'', include('helios.discovery.urls')),
+    ('^admin/(.*)', admin.site.root),
 )
 
 if settings.DEBUG:

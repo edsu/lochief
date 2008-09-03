@@ -105,9 +105,12 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'helios.discovery',
-    #'helios.catalog',
+    'helios.cataloging',
 )
 
 CACHE_BACKEND = 'locmem:///'
