@@ -240,3 +240,10 @@ SORTS = (
 )
 
 SEARCH_CACHE_TIME = 6000    # in seconds
+
+# Import for local overrides
+try:
+    from settings_local import *
+except ImportError:
+    pass
+
