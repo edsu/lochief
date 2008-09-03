@@ -110,7 +110,11 @@ if __name__ == '__main__':
             #mod_path = 'lib.' + options.parsing_module
             module = __import__(mod_path, fromlist=[''])
             print "Converting %s to CSV ..." % file_or_url
-            record_count = module.write_csv(in_handle, csv_handle)
+            try:
+                record_count = module.write_csv(in_handle, csv_handle, 
+                        ils=options.ils)
+            except TypeError:
+                record_count = module.write_csv(in_handle, csv_handle) 
         else:  # load csv directly
             record_count = -1  # start at -1 to account for fieldnames
             if file_or_url == csv_file:
