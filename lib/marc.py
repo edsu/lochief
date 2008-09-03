@@ -386,12 +386,12 @@ def get_record(marc_record, ils=None):
         topics.extend(subfield_list(field, 'x'))
         places.extend(subfield_list(field, 'z'))
         if field.tag == '650':
-            if field['a'] != 'Video marc_recordings for the hearing impaired.':
+            if field['a'] != 'Video recordings for the hearing impaired.':
                 topics.append(normalize(field['a']))
         elif field.tag == '651':
             places.append(normalize(field['a']))
         elif field.tag == '655':
-            if field['a'] != 'Video marc_recordings for the hearing impaired.':
+            if field['a'] != 'Video recordings for the hearing impaired.':
                 genres.append(normalize(field['a']))
         #for subfield_indicator in ('a', 'v', 'x', 'y', 'z'):
         #    more_topics = subfield_list(subfield_indicator)
