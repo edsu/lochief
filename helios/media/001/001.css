@@ -37,11 +37,6 @@ ul {
   font-size: 70%;
 }
 .cover { 
-  /*
-  background: url(covernot.gif) no-repeat; 
-  width: 130px; 
-  height: 170px; 
-  */
   float: right;
   padding: 0 0 0 5px;
 }
@@ -131,14 +126,35 @@ ul {
   max-width: 1000px;
   margin: auto;
 }
-#suggested {  
-  background-color: #D2DFF4; 
-  border: 1px solid #88a0c6; 
-  padding: 5px;
-  margin: 10px 0;
-}
 #facets h3 {  
   margin: 0 0 3px 0;
+}
+#id_query {
+  width: 50%;
+}
+#index-facets {
+  text-align: center;
+  margin: auto;
+  width: 100%;
+}
+#index-facets div {
+  float: left;
+  width: 25%;
+  text-align: left;
+  border: 1px solid #ddd;
+  margin: 0 1% 10px 1%;
+  padding: 10px 1% 10px 5%;
+  overflow: auto;
+}
+#index-facets h3 {
+  margin: 0 0 5px 0;
+}
+#index-facets li {
+  color: #555;
+}
+#index-facets-heading {
+  margin: 40px 0 10px 10px;
+  font-size: 110%;
 }
 #logo { 
   background: url(HeliosLogo.gif) left no-repeat;
@@ -154,6 +170,10 @@ ul {
 }
 #logo span {
   display: none;
+}
+#no-results {
+  clear: left;
+  margin: 30px 25% 20px 5px;
 }
 #pagination-top, #pagination-bottom { 
   padding: 5px 0 0 0;
@@ -176,38 +196,6 @@ ul {
 #searchform #id_field {
   width: 120px;
 }
-#id_query {
-  width: 50%;
-}
-#index-facets {
-  text-align: center;
-  margin: auto;
-  width: 100%;
-}
-#index-facets div {
-  float: left;
-  width: 25%;
-  text-align: left;
-  border: 1px solid #ddd;
-  margin: 0 1% 10px 1%;
-  padding: 10px 1% 10px 5%;
-  /*background: #ddf;*/
-  overflow: auto;
-}
-#index-facets h3 {
-  margin: 0 0 5px 0;
-}
-#index-facets li {
-  color: #555;
-}
-#index-facets-heading {
-  margin: 40px 0 10px 10px;
-  font-size: 110%;
-}
-#no-results {
-  clear: left;
-  margin: 30px 25% 20px 5px;
-}
 #searchpage #logo {
   margin: auto;
   float: none;
@@ -228,6 +216,12 @@ ul {
 #solr-url {
   clear: both;
 }
+#suggested {  
+  background-color: #D2DFF4; 
+  border: 1px solid #88a0c6; 
+  padding: 5px;
+  margin: 10px 0;
+}
 #topbar { 
   clear: left;
   padding: 5px 0;
@@ -245,3 +239,4 @@ ul {
 #topbar #sort_by span {
   padding: 0 2px;
 }
+
