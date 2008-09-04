@@ -103,11 +103,11 @@ if __name__ == '__main__':
         csv_file = options.out_file or 'tmp.csv'
         t1 = time.time()
         if options.parsing_module:
-            csv_handle = open(csv_file, 'w')
             mod_path = options.parsing_module
             if mod_path.endswith('.py'):
                 mod_path = mod_path[:-3]
             module = __import__(mod_path)
+            csv_handle = open(csv_file, 'w')
             print "Converting %s to CSV ..." % file_or_url
             try:
                 record_count = module.write_csv(in_handle, csv_handle, 

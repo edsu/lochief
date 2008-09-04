@@ -23,7 +23,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    #url(r'^cat/', include('helios.cataloging.urls')),
+    url(r'', include('helios.cataloging.urls')),
     url(r'', include('helios.discovery.urls')),
     ('^admin/(.*)', admin.site.root),
 )

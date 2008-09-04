@@ -20,10 +20,10 @@ from django.contrib.auth.models import User
 from django.db import models
 
 class Record(models.Model):
-    id = models.CharField(max_length=256, primary_key=True)
-
     def __unicode__(self):
-        return self.id
+        return unicode(self.id)
+    def current_version(self):
+        return self.version_set.order_by('-id')[0]
 
 class Version(models.Model):
     record = models.ForeignKey(Record)
@@ -32,8 +32,17 @@ class Version(models.Model):
     message = models.CharField(max_length=256)
     committer = models.ForeignKey(User)
 
+    class Meta:
+        ordering = ['-timestamp']
+
     def __unicode__(self):
         return self.message
 
-admin.site.register(Record)
+class VersionInline(admin.TabularInline):
+    model = Version
+
+class RecordAdmin(admin.ModelAdmin):
+    inlines = [VersionInline]
+
+admin.site.register(Record, RecordAdmin)
 admin.site.register(Version)

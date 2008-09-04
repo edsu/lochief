@@ -1,5 +1,4 @@
-# Copyright 2007 Casey Durfee
-# Copyright 2007 Gabriel Farrell
+# Copyright 2008 Gabriel Sean Farrell
 #
 # This file is part of Helios.
 # 
@@ -16,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls.defaults import *
+from django import forms
 
-urlpatterns = patterns('helios.cataloging.views',
-    url(r'^record/(.+)/edit$', 'edit_record', name='cataloging-edit-record'),
-)
+class PersonForm(forms.Form):
+    name = forms.CharField(max_length=256)
+    email = forms.EmailField()
+    url = forms.URLField()

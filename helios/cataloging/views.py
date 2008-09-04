@@ -16,3 +16,23 @@
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
 # Future home of cataloging views.
+
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.template import loader, RequestContext
+from django.utils import simplejson
+
+from helios.cataloging import models
+from helios.cataloging import forms
+
+def edit_record(request, id):
+    context = RequestContext(request)
+    record = get_object_or_404(models.Record, id=id)
+    version = record.current_version()
+    data = simplejson.loads(version.data)
+    
+    form = forms.PersonForm(data)
+    context['form'] = form
+    template = loader.get_template('cataloging/edit_person.html')
+    response = HttpResponse(template.render(context))
+    return response
