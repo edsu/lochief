@@ -40,6 +40,7 @@ class Version(models.Model):
 
 class VersionInline(admin.TabularInline):
     model = Version
+    extra = 1
 
 class RecordAdmin(admin.ModelAdmin):
     inlines = [VersionInline]
