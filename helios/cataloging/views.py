@@ -28,9 +28,8 @@ from helios.cataloging import forms
 def edit_record(request, id):
     context = RequestContext(request)
     record = get_object_or_404(models.Record, id=id)
-    version = record.current_version()
-    data = simplejson.loads(version.data)
-    
+    version = record.get_current()
+    data = version.get_data()
     form = forms.PersonForm(data)
     context['form'] = form
     template = loader.get_template('cataloging/edit_person.html')

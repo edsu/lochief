@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import pprint
 import re
 import string
@@ -30,6 +31,7 @@ from django.http import HttpResponse, Http404
 from django.template import loader, RequestContext
 from django.utils import simplejson
 from django.utils.encoding import iri_to_uri
+from django.utils.html import escape
 from django.utils.http import urlquote
 from django.utils.translation import ugettext as _
 from django.views.decorators.vary import vary_on_headers
@@ -415,6 +417,8 @@ def get_search_results(request):
     # limits_str for use in blocktrans 
     limits_str = _(' and ').join(['<strong>%s</strong>' % x for x in limits]) 
     context['limits_str'] = limits_str 
+    full_query_str = get_full_query_str(query, limits)
+    context['full_query_str'] = full_query_str
     context['get'] = request.META['QUERY_STRING']
     context['query'] = query
     number_found = context['response']['numFound']
@@ -425,10 +429,41 @@ def get_search_results(request):
             settings.ITEMS_PER_PAGE)
     context['DEBUG'] = settings.DEBUG
     context['solr_url'] = solr_url
+    search_history, extended_search_history = get_search_history(request,
+                full_query_str)
+    context['search_history'] = search_history
+    context['extended_search_history'] = extended_search_history
     if not settings.DEBUG: 
         # only cache for production
         cache.set(cache_key, context, settings.SEARCH_CACHE_TIME)
     return context
+
+def get_search_history(request, full_query_str):
+    search_data = (request.get_full_path(), full_query_str)
+    search_history = request.session.get('search_history')
+    if search_history:
+        if search_history[0] != search_data:  # ignore duplicates
+            search_history.insert(0, search_data)
+    else:
+        search_history = [search_data]
+    request.session['search_history'] = search_history[:10]
+    extended_search_history = search_history[3:]
+    search_history = search_history[1:3]  # don't need current
+    return search_history, extended_search_history
+
+def get_full_query_str(query, limits):
+    # TODO: need to escape query and limits, then apply "safe" filter in 
+    # template
+    full_query_list = []
+    if query:
+        full_query_list.append('<strong>%s</strong>' % escape(query))
+    else:
+        full_query_list.append(_('everything'))
+    if limits:
+        full_query_list.append(_(' with '))
+        limits_str = _(' and ').join(['<strong>%s</strong>' % escape(x) for x in limits]) 
+        full_query_list.append(limits_str)
+    return ''.join(full_query_list)
 
 def do_pagination(this_page_num, total, per_page):
     if total % per_page:    

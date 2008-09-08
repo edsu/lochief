@@ -30,51 +30,45 @@
   <link rel="alternate" type="application/atom+xml" href="/feed/atom/?{{ get }}" />
   <link rel="alternate" type="application/rss+xml" href="/feed/rss/?{{ get }}" />
   -->
-  {% ifequal ILS "III" %}
+  {% if MAJAX_URL %}
     <script type="text/javascript" src="{{ MAJAX_URL }}"></script>
-  {% endifequal %}
+  {% endif %}
   <script type="text/javascript">
+    var more_text = "{% trans "Show More..." %}"
+    var fewer_text = "{% trans "Show Fewer..." %}"
     function init() {
       {% if not limits %}
-        $('show-more-suggested').innerHTML = "{% trans "Show More..." %}"
-        $('show-fewer-suggested').innerHTML = "{% trans "Show Fewer..." %}"
-        $('show-more-suggested').onclick = function() {
-          showMore(this, 'facet-list-ext-suggested', 'show-fewer-suggested');
-        };
-        $('show-fewer-suggested').onclick = function() {
-          showFewer(this, 'facet-list-ext-suggested', 'show-more-suggested');
-        };
+        extendWidget('suggested', more_text, fewer_text);
       {% endif %}
       {% for facet in facets %}
         {% if facet.has_more %}
-          $('show-more-{{ facet.field }}').innerHTML = "{% trans "Show More..." %}"
-          $('show-fewer-{{ facet.field }}').innerHTML = "{% trans "Show Fewer..." %}"
-          $('show-more-{{ facet.field }}').onclick = function() {
-            showMore(this, 'facet-list-ext-{{ facet.field }}', 'show-fewer-{{ facet.field }}');
-          };
-          $('show-fewer-{{ facet.field }}').onclick = function() {
-            showFewer(this, 'facet-list-ext-{{ facet.field }}', 'show-more-{{ facet.field }}');
-          };
+          extendWidget('{{ facet.field }}', more_text, fewer_text);
         {% endif %}
       {% endfor %}
+      {% if extended_search_history %}
+        extendWidget('search-history', more_text, fewer_text);
+      {% endif %}
     }
     window.onload = init;
   </script>
 {% endblock %}
 {% block body %}
   <div id="sidebar">
+    {% if search_history %}
+      {% include "discovery/snippets/search_history.html" %}
+    {% endif %}
     {% if not limits %}
       {% for facet in facets %}
         {% ifequal facet.name "Topic" %}
             <div id="suggested">
-              <h3>{% trans "Were You Looking For:" %}</h3>
+              <h3>{% trans "Were you looking for:" %}</h3>
               <ul>
                 {% for term, count in facet.terms %}
                   <li><a href="{% new_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
                 {% endfor %}
               </ul>
               {% if facet.has_more %}
-                <ul class="hidden" id="facet-list-ext-suggested">
+                <ul class="hidden" id="extended-suggested">
                   {% for term, count in facet.extended_terms %}
                     <li><a href="{% new_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
                   {% endfor %}
@@ -109,15 +103,13 @@
               {% for term, count in facet.terms %}
                 <li><a href="{% add_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
               {% endfor %}
-              {% if facet.has_more %}
-                <span class="hidden" id="facet-list-ext-{{ facet.field }}">
-                  {% for term, count in facet.extended_terms %}
-                    <li><a href="{% add_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
-                  {% endfor %}
-                </span>
-              {% endif %}
             </ul>
             {% if facet.has_more %}
+              <ul class="hidden" id="extended-{{ facet.field }}">
+                {% for term, count in facet.extended_terms %}
+                  <li><a href="{% add_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
+                {% endfor %}
+              </ul>
               <span id="show-more-{{ facet.field }}" class="jsclick"></span>
               <span id="show-fewer-{{ facet.field }}" class="hidden jsclick"></span>
             {% endif %}
@@ -140,23 +132,12 @@
           {% endfor %}
         </div>
         <div id="result_details">
-          {% spaceless %}
-            {# span tags are necessary for spaceless to work #}
-            {% trans "Results" %} 
-            <strong>{{ start_number }}-{{ end_number }}</strong> 
-            {% trans "of" %} 
-            <strong>{{ number_found }}</strong> 
-            {% trans "for" %} 
-            {% if query %}
-              <strong>{{ query }}</strong>
-            {% else %}
-              <span>{% trans "a search returning everything" %}</span>
-            {% endif %}
-            {% if limits_str %}
-              {% trans "with" %} {{ limits_str|safe }}
-            {% endif %} 
-            <span>.</span>
-          {% endspaceless %}
+          {% trans "Results" %} 
+          <strong>{{ start_number }}-{{ end_number }}</strong> 
+          {% trans "of" %} 
+          <strong>{{ number_found }}</strong> 
+          {% trans "for" %} 
+          {{ full_query_str|safe }}
         </div>
       </div> 
       {% if pagination.previous_page or pagination.next_page %}
@@ -171,9 +152,9 @@
             <div class="cover">
               <a href="{{ doc.record_url }}">
                 {% if doc.upc %}
-                  <img src="http://worldcat.org/wcpa/servlet/DCARead?standardNo={{ doc.upc|slice:":-1" }}&standardNoType=6" />
+                  <img src="http://worldcat.org/wcpa/servlet/DCARead?standardNo={{ doc.upc|slice:":-1" }}&amp;standardNoType=6" alt="{{ doc.title }}"/>
                 {% else %}{% if doc.isbn_numeric %}
-                  <img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" />
+                  <img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" alt="{{ doc.title }}"/>
                 {% endif %}{% endif %}
               </a>
             </div>

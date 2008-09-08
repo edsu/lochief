@@ -18,12 +18,17 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import simplejson
 
 class Record(models.Model):
     def __unicode__(self):
         return unicode(self.id)
-    def current_version(self):
-        return self.version_set.order_by('-id')[0]
+
+    def get_current(self):
+        return self.get_versions()[0]
+
+    def get_versions(self):
+        return self.version_set.order_by('-id')
 
 class Version(models.Model):
     record = models.ForeignKey(Record)
@@ -37,6 +42,9 @@ class Version(models.Model):
 
     def __unicode__(self):
         return self.message
+
+    def get_data(self):
+        return simplejson.loads(self.data)
 
 class VersionInline(admin.TabularInline):
     model = Version

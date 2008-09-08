@@ -30,6 +30,17 @@ var showFewer = function(fewerLink, toHide, moreLink) {
   $(moreLink).style.display = "block"; 
 }; 
 
+var extendWidget = function(name, more_text, fewer_text) {
+  $('show-more-' + name).innerHTML = more_text;
+  $('show-fewer-' + name).innerHTML = fewer_text;
+  $('show-more-' + name).onclick = function() {
+    showMore(this, 'extended-' + name, 'show-fewer-' + name);
+  };
+  $('show-fewer-' + name).onclick = function() {
+    showFewer(this, 'extended-' + name, 'show-more-' + name);
+  };
+};
+
 /*
 var showMore = function(facetCode) { 
   $("facet-list-ext-" + facetCode).style.display = "block"; 
