@@ -82,6 +82,9 @@ def index(request):
 @vary_on_headers('accept-language', 'accept-encoding')
 def search(request):
     context = RequestContext(request)
+    if request.GET.get('history'):
+        template = loader.get_template('discovery/search_history.html')
+        return HttpResponse(template.render(context))
     context.update(get_search_results(request))
     context['ILS'] = settings.ILS
     context['MAJAX_URL'] = settings.MAJAX_URL
@@ -429,27 +432,28 @@ def get_search_results(request):
             settings.ITEMS_PER_PAGE)
     context['DEBUG'] = settings.DEBUG
     context['solr_url'] = solr_url
-    search_history, extended_search_history = get_search_history(request,
-                full_query_str)
-    context['search_history'] = search_history
-    context['extended_search_history'] = extended_search_history
+    set_search_history(request, full_query_str)
     if not settings.DEBUG: 
         # only cache for production
         cache.set(cache_key, context, settings.SEARCH_CACHE_TIME)
     return context
 
-def get_search_history(request, full_query_str):
-    search_data = (request.get_full_path(), full_query_str)
+def set_search_history(request, full_query_str):
+    timestamp = datetime.now()
+    search_data = (request.get_full_path(), full_query_str, timestamp)
     search_history = request.session.get('search_history')
     if search_history:
-        if search_history[0] != search_data:  # ignore duplicates
-            search_history.insert(0, search_data)
+        # don't add it if it's the same as the last search
+        #if search_history[0][0] != search_data[0]:
+        #    search_history.insert(0, search_data)
+        # remove earlier searches that are the same
+        for past_search_data in search_history:
+            if past_search_data[0] == search_data[0]:
+                search_history.remove(past_search_data)
+        search_history.insert(0, search_data)
     else:
         search_history = [search_data]
     request.session['search_history'] = search_history[:10]
-    extended_search_history = search_history[3:]
-    search_history = search_history[1:3]  # don't need current
-    return search_history, extended_search_history
 
 def get_full_query_str(query, limits):
     # TODO: need to escape query and limits, then apply "safe" filter in 

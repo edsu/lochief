@@ -34,8 +34,8 @@
     <script type="text/javascript" src="{{ MAJAX_URL }}"></script>
   {% endif %}
   <script type="text/javascript">
-    var more_text = "{% trans "Show More..." %}"
-    var fewer_text = "{% trans "Show Fewer..." %}"
+    var more_text = "&darr; {% trans "Show More..." %}"
+    var fewer_text = "&uarr; {% trans "Show Fewer..." %}"
     function init() {
       {% if not limits %}
         extendWidget('suggested', more_text, fewer_text);
@@ -45,18 +45,13 @@
           extendWidget('{{ facet.field }}', more_text, fewer_text);
         {% endif %}
       {% endfor %}
-      {% if extended_search_history %}
-        extendWidget('search-history', more_text, fewer_text);
-      {% endif %}
     }
-    window.onload = init;
+    //window.onload = init;
+    addEventSimple(window, 'load', init);
   </script>
 {% endblock %}
-{% block body %}
+{% block content %}
   <div id="sidebar">
-    {% if search_history %}
-      {% include "discovery/snippets/search_history.html" %}
-    {% endif %}
     {% if not limits %}
       {% for facet in facets %}
         {% ifequal facet.name "Topic" %}
@@ -152,9 +147,9 @@
             <div class="cover">
               <a href="{{ doc.record_url }}">
                 {% if doc.upc %}
-                  <img src="http://worldcat.org/wcpa/servlet/DCARead?standardNo={{ doc.upc|slice:":-1" }}&amp;standardNoType=6" alt="{{ doc.title }}"/>
+                  <img src="http://worldcat.org/wcpa/servlet/DCARead?standardNo={{ doc.upc|slice:":-1" }}&amp;standardNoType=6" /><!--alt="{{ doc.title }}"/>-->
                 {% else %}{% if doc.isbn_numeric %}
-                  <img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" alt="{{ doc.title }}"/>
+                  <img src="http://images.amazon.com/images/P/{{ doc.isbn_numeric }}.01._THUMBZZZ_PB_PU_PU-5_.jpg" /><!-- alt="{{ doc.title }}"/>-->
                 {% endif %}{% endif %}
               </a>
             </div>

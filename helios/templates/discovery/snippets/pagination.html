@@ -2,7 +2,7 @@
 {% load discovery_extras %}
 {% if pagination.previous_page %}
   <span class="page-previous">
-    <a href="{% pagination_url pagination.previous_page.number %}" title="results {{ pagination.previous_page.start }} to {{ pagination.previous_page.end }}">&laquo;&nbsp;{% trans "Previous" %}</a>
+    <a href="{% pagination_url pagination.previous_page.number %}" title="results {{ pagination.previous_page.start }} to {{ pagination.previous_page.end }}">&larr;&nbsp;{% trans "Previous" %}</a>
   </span>
 {% endif %}
 {% if pagination.first_page %}
@@ -26,6 +26,6 @@
 {% endif %}
 {% if pagination.next_page %}
   <span class="page-next">
-    <a href="{% pagination_url pagination.next_page.number %}" title="results {{ pagination.next_page.start }} to {{ pagination.next_page.end }}">{% trans "Next" %}&nbsp;&raquo;</a>
+    <a href="{% pagination_url pagination.next_page.number %}" title="results {{ pagination.next_page.start }} to {{ pagination.next_page.end }}">{% trans "Next" %}&nbsp;&rarr;</a>
   </span>
 {% endif %}

@@ -26,4 +26,3 @@ urlpatterns = patterns('helios.discovery.views',
     #(r'^feed/atom/$', 'atomFeed'),
     #(r'^feed/rss/$', 'rssFeed'),
 )
-

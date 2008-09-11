@@ -116,6 +116,24 @@ ul {
   font-size: 80%;
   margin: 3px 0;
 }
+.search-history-link-opened {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #fff;
+  position: relative;
+  z-index: 1;
+}
+.search-history-list-opened {
+  min-width: 30em;
+  border: 1px solid #ccc;
+  display: block;
+  position: absolute;
+  padding: 3px;
+  background: #fff;
+  margin: 0 10px 0 0;
+  color: #555;
+}
 
 /* 
  * id-level styles
@@ -125,6 +143,9 @@ ul {
   min-width: 760px;
   max-width: 1000px;
   margin: auto;
+}
+#content {
+  clear: both;
 }
 #facets h3 {  
   margin: 0 0 3px 0;
@@ -139,11 +160,11 @@ ul {
 }
 #index-facets div {
   float: left;
-  width: 25%;
+  width: 29%;
   text-align: left;
   border: 1px solid #ddd;
   margin: 0 1% 10px 1%;
-  padding: 10px 1% 10px 5%;
+  padding: 10px 1% 10px 1%;
   overflow: auto;
 }
 #index-facets h3 {
@@ -188,6 +209,13 @@ ul {
 #results { 
   margin-left: 5px;
   margin-right: 25%;
+}
+#search-history {
+  font-size: 80%;
+  margin: 1px 0 0 0;
+}
+#search-history a {
+  padding: 0 2px;
 }
 #searchform { 
   white-space: nowrap;

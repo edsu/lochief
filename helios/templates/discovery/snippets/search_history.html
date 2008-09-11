@@ -1,18 +1,6 @@
 {% load i18n %}
-<div id="search-history">
-  <h3>{% trans "Search History:" %}</h3>
   <ul>
-    {% for url, query in search_history %}
-      <li><a href="{{ url }}">{{ query|safe }}</a></li>
+    {% for url, query, timestamp in search_history %}
+    <li><a href="{{ url }}">{{ query|safe }}</a> ({{ timestamp|timesince }} {% trans "ago" %})</li>
     {% endfor %}
   </ul>
-  {% if extended_search_history %}
-    <ul class="hidden" id="extended-search-history">
-      {% for url, query in extended_search_history %}
-        <li><a href="{{ url }}">{{ query|safe }}</a></li>
-      {% endfor %}
-    </ul>
-    <span id="show-more-search-history" class="jsclick"></span>
-    <span id="show-fewer-search-history" class="hidden jsclick"></span>
-  {% endif %}
-</div>

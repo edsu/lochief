@@ -115,6 +115,16 @@ INSTALLED_APPS = (
 
 CACHE_BACKEND = 'locmem:///'
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "helios.discovery.context_processors.search_history",
+)
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 
 ## Settings specific to this project (that is, non-Django) ##
 

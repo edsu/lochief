@@ -26,6 +26,9 @@
     <link href="{{ MEDIA_URL }}001/001.css" type="text/css" rel="stylesheet" media="screen" />
     <script src="{{ MEDIA_URL }}js/base.js" type="text/javascript"></script>
     {% block head %}{% endblock %}
+    <script type="text/javascript">
+      addEventSimple(window, 'load', searchHistClick);
+    </script>
   </head>
   <body>
     <div id="container">
@@ -45,8 +48,17 @@
             <input type="submit" value="{% trans "Search" %}"/>
           </form>
         </div>  
+        {% if last_search %}
+          <div id="search-history">
+            <a href="{{ last_search }}">&larr; {% trans "Last search" %}</a>
+            <a id="search-history-link" href="{% url discovery-search %}?history=1">&rarr; {% trans "Search history" %}</a>
+          </div>
+          <div id="search-history-list" class="hidden">{% include "discovery/snippets/search_history.html" %}</div>
+        {% endif %}
       </div>
-      {% block body %}{% endblock %}
+      <div id="content">
+        {% block content %}{% endblock %}
+      </div>
     </div>
     <div id="powered">Powered by <a href="http://code.google.com/p/fac-back-opac/">Helios</a>.</div>
   </body>

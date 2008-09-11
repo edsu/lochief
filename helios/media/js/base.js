@@ -11,6 +11,14 @@ function $() {
   return elements; 
 }; 
 
+// from http://www.quirksmode.org/js/eventSimple.html
+function addEventSimple(obj,evt,fn) {
+  if (obj.addEventListener)
+    obj.addEventListener(evt,fn,false);
+  else if (obj.attachEvent)
+    obj.attachEvent('on'+evt,fn);
+}
+
 var setFocus = function() { document.search.q.focus(); };         
 
 var doSort = function() { 
@@ -41,6 +49,22 @@ var extendWidget = function(name, more_text, fewer_text) {
   };
 };
 
+function searchHistClick() {
+  $('search-history-link').onclick = function() {
+    if (this.className == 'search-history-link-opened') {
+      this.className = '';
+      //this.innerHTML = '&rarr; Search history';
+      this.innerHTML = this.text.replace('↓', '→')
+      $('search-history-list').className = 'hidden';
+    } else {
+      this.className = 'search-history-link-opened';
+      //this.innerHTML = '&darr; Search history';
+      this.innerHTML = this.text.replace('→', '↓')
+      $('search-history-list').className = 'search-history-list-opened';
+    }
+    return false;
+  };
+};
 /*
 var showMore = function(facetCode) { 
   $("facet-list-ext-" + facetCode).style.display = "block"; 
