@@ -234,9 +234,9 @@
               {% endif %}
               <div class="holdings">
                 <span class="metadata">{% trans "Holdings:" %}</span>
-                {% ifequal ILS "III" %}
+                {% if MAJAX_URL %}
                   <span class="majax-showholdings" title=".{{ doc.id }}"></span>
-                {% endifequal %}
+                {% endif %}
                 {% ifequal doc.availability "Available" %}
                   <span class="available">{{ doc.availability }}</span>
                 {% endifequal %}                               
