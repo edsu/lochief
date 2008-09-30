@@ -3,7 +3,7 @@
 # Starts, stops, and restarts solr
 
 SOLR_DIR="/usr/local/solr/example"
-JAVA_OPTIONS="-Xmx512m -DSTOP.PORT=8079 -DSTOP.KEY=stopkey -jar start.jar"
+JAVA_OPTIONS="-Xmx512m -DSTOP.PORT=8079 -DSTOP.KEY=stopkey -Dsolr.solr.home=multicore -jar start.jar"
 LOG_FILE="/var/log/solr.log"
 JAVA="/usr/bin/java"
 
@@ -12,15 +12,16 @@ case $1 in
         echo "Starting Solr...."
         cd $SOLR_DIR
         $JAVA $JAVA_OPTIONS 2> $LOG_FILE &
+        sleep 1
         ;;
     stop)
         echo "Stopping Solr...."
         cd $SOLR_DIR
         $JAVA $JAVA_OPTIONS --stop
+        sleep 1
         ;;
     restart)
         $0 stop
-        sleep 1
         $0 start
         ;;
     *)
