@@ -17,8 +17,23 @@
   You should have received a copy of the GNU General Public License
   along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
-{% block body %}
-  <div style="clear:both">
-    {{ form.as_p }}
+{% block content %}
+  <div class="record">
+    <form method="post">
+      <table class="form">
+        {{ person_form }}
+      </table>
+      <table class="form formset">
+        <tr><th></th><td>Positions</td></tr>
+        {{ position_formset }}
+      </table>
+      <table class="form formset">
+        <tr><th></th><td>History</td></tr>
+        {{ history_formset }}
+      </table>
+      <table class="form">
+        <tr><th></th><td><input type="submit" value="Save" /></td></tr>
+      </table>
+    </form>
   </div>
 {% endblock %}

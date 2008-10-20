@@ -30,8 +30,22 @@ def edit_record(request, id):
     record = get_object_or_404(models.Record, id=id)
     version = record.get_current()
     data = version.get_data()
-    form = forms.PersonForm(data)
-    context['form'] = form
+    if request.method == "POST":
+        person_form = forms.PersonForm(request.POST)
+        position_formset = forms.PositionFormSet(request.POST)
+        history_formset = forms.HistoryFormSet(request.POST)
+        if (person_form.is_valid() and position_formset.is_valid() and
+                history_formset.is_valid()):
+            context['entered'] = person_form.cleaned_data
+        else:
+            context['entered'] = 'not valid'
+    else:
+        person_form = forms.PersonForm(initial=data)
+        position_formset = forms.PositionFormSet(initial=data['positions'])
+        history_formset = forms.HistoryFormSet(initial=data['history'])
+    context['person_form'] = person_form
+    context['position_formset'] = position_formset
+    context['history_formset'] = history_formset
     template = loader.get_template('cataloging/edit_person.html')
     response = HttpResponse(template.render(context))
     return response

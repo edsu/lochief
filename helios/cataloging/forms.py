@@ -16,8 +16,21 @@
 # along with Helios.  If not, see <http://www.gnu.org/licenses/>.
 
 from django import forms
+from django.forms.formsets import formset_factory
+
+class HistoryForm(forms.Form):
+    message = forms.CharField(label='')
 
 class PersonForm(forms.Form):
-    name = forms.CharField(max_length=256)
+    name = forms.CharField()
     email = forms.EmailField()
     url = forms.URLField()
+
+class PositionForm(forms.Form):
+    title = forms.CharField()
+    employer = forms.CharField()
+    start_date = forms.DateField(required=False)
+    end_date = forms.DateField(required=False)
+
+PositionFormSet = formset_factory(PositionForm, can_delete=True)
+HistoryFormSet = formset_factory(HistoryForm)

@@ -59,7 +59,7 @@ def get_record(tr):
     position_text = ' '.join(position_text.split())
     record['positions'] = []
     position = {
-        'position_title': position_text,
+        'title': position_text,
         'employer': school_text,
     }
     record['positions'].append(position)
@@ -73,8 +73,11 @@ def get_record(tr):
     if not email_text:
         email_text = email.span.contents[-1]
     email_text = email_text.strip()
+    email_text = email_text.replace('(at)', '@')
     record['email'] = email_text
-    record['history'] = ['Ingested from http://www.slis.indiana.edu/faculty/meho/LIS-Directory/ at %s' % datetime.now()]
+    record['history'] = [{
+        'message': 'Ingested from http://www.slis.indiana.edu/faculty/meho/LIS-Directory/ at %s' % datetime.now(),
+    }]
     record['type'] = ['entity', 'person']
     return record
 
