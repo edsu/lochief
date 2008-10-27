@@ -22,6 +22,9 @@
 {% block title %} | {{ doc.title }}{% endblock %}
 {% block head %}
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{% url discovery-unapi %}"/>
+  {% if MAJAX_URL %}
+    <script type="text/javascript" src="{{ MAJAX_URL }}"></script>
+  {% endif %}
 {% endblock %}
 {% block content %}
   <div id="sidebar">
@@ -189,9 +192,9 @@
         {% endif %}
         <div class="holdings">
           <span class="metadata">{% trans "Holdings:" %}</span>
-          {% ifequal ILS "III" %}
+          {% if MAJAX_URL %}
             <span class="majax-showholdings" title=".{{ doc.id }}"></span>
-          {% endifequal %}
+          {% endif %}
           {% ifequal doc.availability "Available" %}
             <span class="available">{{ doc.availability }}</span>
           {% endifequal %}                               

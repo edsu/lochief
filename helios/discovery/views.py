@@ -112,6 +112,7 @@ def record(request, record_id):
     subject_terms.reverse()
     subject_terms = [(x[1], x[0]) for x in subject_terms]
     context['subject_terms'] = subject_terms
+    context['MAJAX_URL'] = settings.MAJAX_URL
     template = loader.get_template('discovery/record.html')
     return HttpResponse(template.render(context))
 
