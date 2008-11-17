@@ -15,6 +15,7 @@ a:hover {
 body { 
   font-family: Verdana, Arial, Sans-Serif; 
   background: url(HeliosGrad.gif) repeat-x; 
+  font-size: 100%;
 }
 img {
   border: none;
@@ -37,7 +38,7 @@ ul {
 .beta {
   color: #d1d1d1; 
   vertical-align: super; 
-  font-size: 70%;
+  font-size: 0.7em;
 }
 .cover { 
   float: right;
@@ -109,14 +110,14 @@ ul {
   margin: 10px 0;
 }
 .recordinfo h2.title { 
-  font-size: medium;
+  font-size: 1em;
   font-weight: normal;
 }
 .recordinfo h2.title a { 
-  font-size: 130%;
+  font-size: 1.3em;
 }
 .recordinfo div {
-  font-size: 80%;
+  font-size: 0.8em;
   margin: 3px 0;
 }
 .search-history-link-opened {
@@ -186,13 +187,13 @@ table.formset {
 }
 #index-facets-heading {
   margin: 40px 0 10px 10px;
-  font-size: 110%;
+  font-size: 1.1em;
 }
 #logo { 
   background: url(HeliosLogo.gif) left no-repeat;
   color: #0063dc; 
   float: left;
-  font-size: 200%; 
+  font-size: 2em; 
   letter-spacing: .1em; 
 }
 #logo a:visited, #logo a:link, #logo a:hover, #logo a:active { 
@@ -213,7 +214,7 @@ table.formset {
 }
 #powered {
   clear: both;
-  font-size: 80%;
+  font-size: 0.8em;
   text-align: right;
   padding: 30px 20px 10px 0;
 }
@@ -222,7 +223,7 @@ table.formset {
   margin-right: 25%;
 }
 #search-history {
-  font-size: 80%;
+  font-size: 0.8em;
   margin: 1px 0 0 0;
 }
 #search-history a {
@@ -243,7 +244,7 @@ table.formset {
 }
 #sidebar {
   float: right; 
-  font-size: 80%; 
+  font-size: 0.8em; 
   margin-right: 5px;
   padding: 0 5px;
   width: 21%; 
@@ -264,7 +265,7 @@ table.formset {
 #topbar { 
   clear: left;
   padding: 5px 0;
-  font-size: 80%;
+  font-size: 0.8em;
 }
 #topbar #result_details {
   padding: 0 0 0 30px;
