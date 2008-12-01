@@ -152,7 +152,7 @@ def unapi(request):
         else:
             raise Http404 # should be 406 -- see http://unapi.info/specs/
     if identifier:
-        pass
+        context['id'] = identifier
     template = loader.get_template('discovery/unapi.xml')
     return HttpResponse(template.render(context), mimetype='application/xml')
 
