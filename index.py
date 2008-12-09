@@ -94,6 +94,8 @@ if __name__ == '__main__':
     parser.add_option('-s', '--solr', dest='solr', metavar='SOLR_URL', 
         help='URL for Solr, defaults to "%s"' % settings.SOLR_URL, 
         default=settings.SOLR_URL)
+    parser.add_option('-x', '--xml', dest='in_xml', metavar='MARCXML', 
+        action='store_false', default=False, help='MARC file is in MARCXML')
     options, args = parser.parse_args()
     if len(args) != 1:
         parser.print_help()
@@ -111,7 +113,7 @@ if __name__ == '__main__':
             print "Converting %s to CSV ..." % file_or_url
             try:
                 record_count = module.write_csv(in_handle, csv_handle, 
-                        ils=options.ils)
+                        ils=options.ils, in_xml=options.in_xml)
             except TypeError:
                 record_count = module.write_csv(in_handle, csv_handle) 
         else:  # load csv directly

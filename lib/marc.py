@@ -424,7 +424,7 @@ def get_row(record):
     row = RowDict(record)
     return row
 
-def write_csv(marc_file_handle, csv_file_handle, ils=None):
+def write_csv(marc_file_handle, csv_file_handle, ils=None, in_xml=False):
     """
     Convert a MARC dump file to a CSV file.
     """
@@ -435,7 +435,10 @@ def write_csv(marc_file_handle, csv_file_handle, ils=None):
     #>>> csv_records == csv_measure
     #True
     #>>> os.remove('test/records.csv')
-    reader = pymarc.MARCReader(marc_file_handle)
+    if in_xml:
+        reader = pymarc.marcxml.parse_xml_to_array(marc_file_handle)
+    else:
+        reader = pymarc.MARCReader(marc_file_handle)
     fieldname_dict = {}
     for fieldname in FIELDNAMES:
         fieldname_dict[fieldname] = fieldname
