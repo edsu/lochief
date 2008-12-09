@@ -95,7 +95,7 @@ if __name__ == '__main__':
         help='URL for Solr, defaults to "%s"' % settings.SOLR_URL, 
         default=settings.SOLR_URL)
     parser.add_option('-x', '--xml', dest='in_xml', 
-        action='store_false', default=False, help='MARC file is in MARCXML')
+        action='store_true', help='MARC file is in MARCXML')
     options, args = parser.parse_args()
     if len(args) != 1:
         parser.print_help()
