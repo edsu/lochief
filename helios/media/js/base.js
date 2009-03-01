@@ -54,12 +54,12 @@ function searchHistClick() {
     if (this.className == 'search-history-link-opened') {
       this.className = '';
       //this.innerHTML = '&rarr; Search history';
-      this.innerHTML = this.text.replace('↓', '→')
+      this.innerHTML = this.text.replace('↓', '→');
       $('search-history-list').className = 'hidden';
     } else {
       this.className = 'search-history-link-opened';
       //this.innerHTML = '&darr; Search history';
-      this.innerHTML = this.text.replace('→', '↓')
+      this.innerHTML = this.text.replace('→', '↓');
       $('search-history-list').className = 'search-history-list-opened';
     }
     return false;
