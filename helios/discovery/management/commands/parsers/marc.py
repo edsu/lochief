@@ -31,7 +31,7 @@ except NameError:
     from sets import Set as set
 
 # local libs
-from lib import marc_maps
+import marc_maps
 
 NONINT_RE = re.compile(r'\D')
 ISBN_RE = re.compile(r'(\b\d{10}\b|\b\d{13}\b)')
@@ -238,6 +238,8 @@ def get_record(marc_record, ils=None):
     """
     record = {}
 
+    # TODO: split ILS-specific into separate parsers that subclass this one:
+    # horizonmarc, iiimarc, etc.
     try:
         if ils == 'Horizon':
             record['id'] = marc_record['999']['a']
@@ -424,7 +426,7 @@ def get_row(record):
     row = RowDict(record)
     return row
 
-def write_csv(marc_file_handle, csv_file_handle, ils=None, in_xml=False):
+def write_csv(marc_file_handle, csv_file_handle, ils=None):
     """
     Convert a MARC dump file to a CSV file.
     """
@@ -435,10 +437,12 @@ def write_csv(marc_file_handle, csv_file_handle, ils=None, in_xml=False):
     #>>> csv_records == csv_measure
     #True
     #>>> os.remove('test/records.csv')
-    if in_xml:
-        reader = pymarc.marcxml.parse_xml_to_array(marc_file_handle)
-    else:
-        reader = pymarc.MARCReader(marc_file_handle)
+
+    # TODO: move xml parsing to marcxml parser
+    #if in_xml:
+    #    reader = pymarc.marcxml.parse_xml_to_array(marc_file_handle)
+    #else:
+    reader = pymarc.MARCReader(marc_file_handle)
     fieldname_dict = {}
     for fieldname in FIELDNAMES:
         fieldname_dict[fieldname] = fieldname
