@@ -1,0 +1,209 @@
+<?xml version="1.0" ?>
+<!--  For more information see http://wiki.apache.org/solr/SchemaXml -->
+<schema name="kochief" version="1.1">
+  <types>
+    <fieldtype name="string" class="solr.StrField" sortMissingLast="true"/>
+    <fieldtype name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+    <fieldtype name="integer" class="solr.IntField"/>
+    <fieldtype name="long" class="solr.LongField"/>
+    <fieldtype name="float" class="solr.FloatField"/>
+    <fieldtype name="double" class="solr.DoubleField"/>
+    <fieldtype name="sint" class="solr.SortableIntField" sortMissingLast="true"/>
+    <fieldtype name="slong" class="solr.SortableLongField" sortMissingLast="true"/>
+    <fieldtype name="sfloat" class="solr.SortableFloatField" sortMissingLast="true"/>
+    <fieldtype name="sdouble" class="solr.SortableDoubleField" sortMissingLast="true"/>
+    <fieldtype name="date" class="solr.DateField" sortMissingLast="true"/>
+    <fieldtype name="text_lu" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.StandardFilterFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory"/>
+        <filter class="solr.EnglishPorterFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    <fieldtype name="text_ws" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+      </analyzer>
+    </fieldtype>
+    <fieldtype name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.EnglishPorterFilterFactory"/>
+        <!-- Unicode normalization and diacritics filtering done by 
+          solr/lib/SolrPlugins.jar, which we're moving away from to the
+          solr.ISOLatin1AccentFilterFactory. 
+          See http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters
+        <filter class="schema.UnicodeNormalizationFilterFactory"/>       
+        <filter class="schema.DiacriticsFilterFactory"/>       
+        -->
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.EnglishPorterFilterFactory"/>
+        <!--
+        <filter class="schema.UnicodeNormalizationFilterFactory"/>       
+        <filter class="schema.DiacriticsFilterFactory"/>       
+        -->
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    <fieldtype name="textTight" class="solr.TextField" positionIncrementGap="100" >
+      <analyzer>
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="0" generateNumberParts="0" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.EnglishPorterFilterFactory"/>
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    <!-- textTighter is a fieldtype with no stemming and no stopwords. -->
+    <fieldtype name="textTighter" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.WordDelimiterFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <!--
+        <filter class="schema.UnicodeNormalizationFilterFactory"/>       
+        <filter class="schema.DiacriticsFilterFactory"/>       
+        -->
+        <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+    </fieldtype>
+    <!-- sorting is for sorting titles.  For better efficiency, title_sort 
+      should be a "string" fieldtype once we deal with indexer unicode 
+      issues. -->
+    <fieldtype name="sorting" class="solr.TextField" sortMissingLast="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+        <!--
+        <filter class="schema.UnicodeNormalizationFilterFactory"/>       
+        <filter class="schema.DiacriticsFilterFactory"/>       
+        -->
+      </analyzer>
+    </fieldtype>
+  </types>
+  <fields>
+    <dynamicField name="*_facet" type="string" indexed="true" stored="false" multiValued="true"/>
+    <field name="LCClass" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="SSdata" type="string" indexed="false" stored="true" multiValued="true" />
+    <field name="audience" type="textTighter" indexed="true" stored="true" />
+    <field name="author" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="availability" type="string" indexed="true" stored="true" multiValued="false" />
+    <field name="barcode" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="bib_num" type="string" indexed="true" stored="true" />
+    <field name="callnum" type="string" indexed="false" stored="true" />
+    <field name="callnumlayerone" type="string" indexed="true" stored="true" />
+    <field name="callnumlayertwo" type="string" indexed="true" stored="true" />
+    <field name="collection" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="contents" type="text" indexed="true" stored="true" multiValued="true" />
+    <field name="copyinfo" type="text_ws" indexed="true" stored="true" multiValued="true" />
+    <field name="corporate_name" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="ctrl_num" type="string" indexed="true" stored="true" />
+    <field name="description" type="string" stored="true" multiValued="true" />
+    <field name="deweyClass" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="dubbed" type="textTighter" indexed="true" stored="false" multiValued="true" />    
+    <field name="email" type="textTighter" indexed="true" stored="true" multiValued="true" />    
+    <field name="format" type="string" indexed="true" stored="true" />
+    <field name="full_title" type="textTighter" indexed="true" stored="true" />
+    <field name="genre" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="id" type="string" indexed="true" stored="true" />
+    <field name="imprint" type="string" indexed="false" stored="true" />
+    <field name="isbn" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="issn" type="string" indexed="true" stored="true" />
+    <field name="language" type="textTighter" indexed="true" stored="true" multiValued="true" />    
+    <field name="language_dubbed" type="textTighter" indexed="true" stored="false" multiValued="true" />    
+    <field name="language_subtitles" type="textTighter" indexed="true" stored="false" multiValued="true" />    
+    <field name="location" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="marc_record" type="string" indexed="false" stored="true" multiValued="false" />
+    <field name="name" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="notes" type="string" stored="true" multiValued="true" />
+    <field name="oclc_num" type="string" indexed="true" stored="true" />
+    <field name="performer" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="personal_name" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="place" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="position" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="pubyear" type="string" indexed="true" stored="true" />
+    <field name="pubyearrange" type="string" indexed="true" stored="true" />
+    <field name="publisher_exact" type="string" indexed="true" stored="false" />
+    <field name="rating" type="string" indexed="true" stored="true" />
+    <field name="publisher" type="textTighter" indexed="true" stored="true" />
+    <field name="series" type="text" indexed="true" stored="true" multiValued="true"/>
+    <field name="status" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="subject" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="subjectentity" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="subjectname" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="subtitles" type="textTighter" indexed="true" stored="false" multiValued="true" />    
+    <field name="summary" type="string" stored="true" multiValued="true" />
+    <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
+    <field name="title" type="textTighter" indexed="true" stored="true" />
+    <field name="title_sort" type="sorting" indexed="true" stored="true" />
+    <field name="topic" type="textTighter" indexed="true" stored="true" multiValued="true" />
+    <field name="upc" type="string" indexed="true" stored="true" />
+    <field name="url" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="year" type="string" indexed="true" stored="true" />
+  </fields>
+  <uniqueKey>id</uniqueKey>
+  <defaultSearchField>text</defaultSearchField>
+  <solrQueryParser defaultOperator="AND"/>
+  <copyField source="audience" dest="audience_facet" />
+  <copyField source="author" dest="author_facet" />
+  <copyField source="author" dest="text"/>
+  <copyField source="contents" dest="text" />
+  <copyField source="corporate_name" dest="name" />
+  <copyField source="corporate_name" dest="name_facet" />
+  <copyField source="corporate_name" dest="text" />
+  <copyField source="format" dest="text"/>
+  <copyField source="format" dest="format_facet"/>
+  <copyField source="genre" dest="genre_facet" />
+  <copyField source="genre" dest="subject" />
+  <copyField source="genre" dest="subject_facet"/>
+  <copyField source="genre" dest="text" />  
+  <copyField source="isbn" dest="text" />
+  <copyField source="issn" dest="text" />
+  <copyField source="language" dest="language_facet"/>
+  <copyField source="language_dubbed" dest="dubbed"/>
+  <copyField source="language_dubbed" dest="language_dubbed_facet"/>
+  <copyField source="language_subtitles" dest="language_subtitles_facet"/>
+  <copyField source="language_subtitles" dest="subtitles"/>
+  <copyField source="notes" dest="text" />
+  <copyField source="performer" dest="text" />
+  <copyField source="personal_name" dest="name" />
+  <copyField source="personal_name" dest="name_facet" />
+  <copyField source="personal_name" dest="personal_name_facet" />
+  <copyField source="personal_name" dest="text" />
+  <copyField source="place" dest="subject"/>
+  <copyField source="place" dest="subject_facet"/>
+  <copyField source="place" dest="place_facet"/>
+  <copyField source="place" dest="text"/>
+  <copyField source="position" dest="position_facet"/>
+  <copyField source="publisher" dest="publisher_exact" />
+  <copyField source="publisher" dest="text"/>
+  <copyField source="pubyear" dest="pubyear_facet"/>
+  <copyField source="pubyear" dest="year"/>
+  <copyField source="pubyear" dest="year_facet"/>
+  <copyField source="series" dest="text" />
+  <copyField source="subjectentity" dest="subject"/>
+  <copyField source="subjectentity" dest="text"/>
+  <copyField source="subjectname" dest="subject"/>
+  <copyField source="subjectname" dest="text"/>
+  <copyField source="summary" dest="text"/> 
+  <copyField source="full_title" dest="text"/>
+  <copyField source="topic" dest="subject"/>
+  <copyField source="topic" dest="subject_facet"/>
+  <copyField source="topic" dest="text"/>
+  <copyField source="topic" dest="topic_facet"/>
+  <copyField source="url" dest="text" />
+</schema>
+
