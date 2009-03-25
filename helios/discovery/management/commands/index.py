@@ -23,6 +23,7 @@
 
 import os
 import optparse
+import sys
 import time
 import urllib
 from optparse import make_option
@@ -35,9 +36,6 @@ except ImportError:
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-## local libraries
-#import lib
-
 CSV_FILE = 'tmp.csv'
 
 class Command(BaseCommand):
@@ -49,51 +47,48 @@ class Command(BaseCommand):
         make_option('-p', '--parser',
             dest='parser',
             metavar='PARSER', 
-            help='Use PARSER (relative path) to parse FILEs for indexing'),
+            help='Use PARSER (in helios/parsers/) to parse files or urls for indexing'),
     )
     help = 'Indexes documents in a Solr instance.'
-    args = '[FILE ...]'
+    args = '[file_or_url ...]'
 
-    def handle(self, *data_files, **options):
+    def handle(self, *file_or_urls, **options):
         new = options.get('new')
         if new:
             # create/replace index
             pass
-        if data_files:
+        if file_or_urls:
             parser = options.get('parser')
             module = None
             if parser:
                 if parser.endswith('.py'):
                     parser = parser[:-3]
-                module = __import__(parser)
-            for data_file in data_files:
-                if not module:
-                    # guess parser based on file extension
-                    if data_file.endswith('.mrc'):
-                        from parsers import marc as module
-                if not module:
-                    raise CommandError("Please specify a parser.")
-                print "Converting %s to CSV ..." % data_file
-                t1 = time.time()
-                try:
-                    data_handle = open(data_file, 'r')
-                    try:
-                        csv_handle = open(CSV_FILE, 'w')
-                        record_count = module.write_csv(data_handle, 
-                                csv_handle)
-                    finally:
-                        csv_handle.close()
-                finally:
-                    data_handle.close()
-                t2 = time.time()
-                self._load_solr(CSV_FILE)
-                t3 = time.time()
-                os.remove(CSV_FILE)
-                p_time = (t2 - t1) / 60
-                l_time = (t3 - t2) / 60
-                t_time = p_time + l_time
-                rate = record_count / (t3 - t1)
-                print """Processing took %0.3f minutes.
+                module = __import__('helios.parsers.' + parser, globals(), 
+                        locals(), [parser])
+        for file_or_url in file_or_urls:
+            if not module:
+                # guess parser based on file extension
+                if file_or_url.endswith('.mrc'):
+                    from helios.parsers import marc as module
+            if not module:
+                raise CommandError("Please specify a parser.")
+            print "Converting %s to CSV ..." % file_or_url
+            t1 = time.time()
+            data_handle = urllib.urlopen(file_or_url)
+            try:
+                csv_handle = open(CSV_FILE, 'w')
+                record_count = module.write_csv(data_handle, csv_handle)
+            finally:
+                csv_handle.close()
+            t2 = time.time()
+            self._load_solr(CSV_FILE)
+            t3 = time.time()
+            os.remove(CSV_FILE)
+            p_time = (t2 - t1) / 60
+            l_time = (t3 - t2) / 60
+            t_time = p_time + l_time
+            rate = record_count / (t3 - t1)
+            print """Processing took %0.3f minutes.
 Loading took %0.3f minutes.  
 That's %0.3f minutes total for %d records, 
 at a rate of %0.3f records per second.
@@ -133,80 +128,4 @@ at a rate of %0.3f records per second.
             raise IOError, 'Unable to connect to the Solr instance.'
         print "Solr response:\n"
         print output.read()
-
-if __name__ == '__main__':
-    usage = "usage: %prog [options] FILE_OR_URL"
-    parser = optparse.OptionParser(usage=usage)
-    ils_choices = ('', 'III', 'Unicorn', 'Horizon')
-    if settings.ILS:
-        ils_default = ', defaults to "%s"' % settings.ILS
-    else:
-        ils_default = ''
-    parser.add_option('-i', '--ils', dest='ils', metavar='ILS', 
-        help='ILS the MARC was exported from' + ils_default, 
-        choices=ils_choices, 
-        default=settings.ILS)
-    parser.add_option('-o', '--output', dest='out_file', metavar='OUT_FILE', 
-        help='output the CSV to OUT_FILE instead of loading it into a SOLR instance')
-    parser.add_option('-p', '--parsing_module', dest='parsing_module', 
-        metavar='PARSING_MODULE', 
-        help='use PARSING_MODULE (relative path to the module) to parse FILE_OR_URL and convert to CSV')
-    parser.add_option('-s', '--solr', dest='solr', metavar='SOLR_URL', 
-        help='URL for Solr, defaults to "%s"' % settings.SOLR_URL, 
-        default=settings.SOLR_URL)
-    parser.add_option('-x', '--xml', dest='in_xml', 
-        action='store_true', help='MARC file is in MARCXML')
-    options, args = parser.parse_args()
-    if len(args) != 1:
-        parser.print_help()
-    else:
-        file_or_url = args[0]
-        in_handle = urllib.urlopen(file_or_url)
-        csv_file = options.out_file or 'tmp.csv'
-        t1 = time.time()
-        if options.parsing_module:
-            mod_path = options.parsing_module
-            if mod_path.endswith('.py'):
-                mod_path = mod_path[:-3]
-            module = __import__(mod_path)
-            csv_handle = open(csv_file, 'w')
-            print "Converting %s to CSV ..." % file_or_url
-            try:
-                record_count = module.write_csv(in_handle, csv_handle, 
-                        ils=options.ils, in_xml=options.in_xml)
-            except TypeError:
-                record_count = module.write_csv(in_handle, csv_handle) 
-        else:  # load csv directly
-            record_count = -1  # start at -1 to account for fieldnames
-            if file_or_url == csv_file:
-                # check for equality here stops us from overwriting csv_file
-                # if we're loading it again
-                try:
-                    for line in in_handle:
-                        record_count += 1
-                finally:
-                    in_handle.close()
-            else:
-                csv_handle = open(csv_file, 'w')
-                try:
-                    for line in in_handle:
-                        record_count += 1
-                        csv_handle.write(line)
-                finally:
-                    in_handle.close()
-                    csv_handle.close()
-        t2 = time.time()
-        if not options.out_file:
-            load_solr(csv_file, options.solr)
-        t3 = time.time()
-        p_time = (t2 - t1) / 60
-        l_time = (t3 - t2) / 60
-        t_time = p_time + l_time
-        rate = record_count / (t3 - t1)
-        print """Processing took %0.3f minutes.
-Loading took %0.3f minutes.  
-That's %0.3f minutes total for %d records, 
-at a rate of %0.3f records per second.
-""" % (p_time, l_time, t_time, record_count, rate)
-
 
