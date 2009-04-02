@@ -194,6 +194,7 @@ table.formset {
   float: left;
   font-size: 2em; 
   letter-spacing: .1em; 
+  margin-right: 20px;
 }
 #logo a:visited, #logo a:link, #logo a:hover, #logo a:active { 
   display: block; 
