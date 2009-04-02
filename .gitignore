@@ -1,0 +1,3 @@
+*.pyc
+kochief/kochief.db
+kochief/solr/data
