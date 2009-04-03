@@ -97,7 +97,7 @@ at a rate of %0.3f records per second.
     def _get_multi(self):
         """Inspect solr schema.xml for multivalue fields."""
         multivalue_fieldnames = []
-        schema = et.parse(settings.SOLR_SCHEMA)
+        schema = et.parse(settings.SOLR_DIR + 'conf/schema.xml')
         fields_element = schema.find('fields')
         field_elements = fields_element.findall('field')
         for field in field_elements:

@@ -130,7 +130,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SOLR_URL = 'http://localhost:8983/solr/test/'
 
-SOLR_SCHEMA = BASE_DIR + 'solr/conf/schema.xml'
+SOLR_DIR = BASE_DIR + 'solr/'
 
 # III, Unicorn, or Horizon -- affects both display and index/ingest
 ILS = ''
