@@ -128,7 +128,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ## Settings specific to this project (that is, non-Django) ##
 
-SOLR_URL = 'http://localhost:8983/solr/test/'
+SOLR_URL = 'http://localhost:8983/solr/'
 
 SOLR_DIR = BASE_DIR + 'solr/'
 
