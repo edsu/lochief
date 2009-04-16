@@ -102,6 +102,13 @@ def personal_name(request, token=''):
 def subject(request, token=''):
     return concept(request, field='subject', token=token)
 
+def genre(request, token=''):
+    return concept(request, field='genre', token=token)
+
+def place(request, token=''):
+    return concept(request, field='place', token=token)
+
+
 @vary_on_headers('accept-language', 'accept-encoding')
 def concept(request, field='', token=''):
     context = RequestContext(request)

@@ -167,7 +167,7 @@
                 <div class="names">
                   <span class="metadata">{% trans "Names:" %}</span>
                   {% for name in doc.name %}
-                  <a href="{% new_limit "name" name %}" title="{% trans "Search for" %} {{ name }}">{{ name }}</a>
+                  <a href="{% url personal_name name %}" title="{% trans "Search for" %} {{ name }}">{{ name }}</a>
                   {% endfor %}
                 </div>
               {% endif %}
@@ -175,7 +175,7 @@
                 <div class="subjects">
                   <span class="metadata">{% trans "Subjects:" %}</span>
                   {% for subject in doc.subject %}
-                    <a href="{% new_limit "subject" subject %}" title="{% trans "Search for" %} {{ subject }}">{{ subject }}</a>
+                    <a href="{% url subject subject %}" title="{% trans "Search for" %} {{ subject }}">{{ subject }}</a>
                   {% endfor %}
                 </div>
               {% endif %}

@@ -29,6 +29,10 @@ urlpatterns = patterns('kochief.discovery.views',
         name='subject'),
     url(r'^personal_name/(?P<token>[\sa-zA-Z0-9:._-]+)$', 'personal_name',
         name='personal_name'),
+    url(r'^place/(?P<token>[\sa-zA-Z0-9:._-]+)$', 'place',
+        name='place'),
+    url(r'^genre/(?P<token>[\sa-zA-Z0-9:._-]+)$', 'genre',
+        name='genre'),
         
         
     url(r'^unapi$', 'unapi', name='discovery-unapi'),

@@ -32,7 +32,7 @@
       <h3>{% trans "Relevant subjects:" %}</h3>
       <ul>
         {% for term, count in subject_terms %}
-          <li><a href="{% new_limit 'subject' term %}">{{ term }}</a> ({{ count }})</li>
+          <li><a href="{% url subject term %}">{{ term }}</a> ({{ count }})</li>
         {% endfor %}
       </ul>
     </div>
@@ -72,7 +72,7 @@
           <div class="names">
             <span class="metadata">{% trans "Names:" %}</span>
             {% for name in doc.name %}
-              <a href="{% new_limit "name" name %}">{{ name }}</a>
+              <a href="{% url personal_name name %}">{{ name }}</a>
             {% endfor %}
           </div>
         {% endif %}
@@ -80,7 +80,7 @@
           <div class="topics">
             <span class="metadata">{% trans "Topics:" %}</span>
             {% for topic in doc.topic %}
-              <a href="{% new_limit "topic" topic %}">{{ topic }}</a>
+              <a href="{% url subject topic %}">{{ topic }}</a>
             {% endfor %}
           </div>
         {% endif %}
