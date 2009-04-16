@@ -33,7 +33,7 @@
       <h3>{{ facet.name }}</h3>
       <ul>
         {% for term, count in facet.terms %}
-          <li><a href="{% new_limit facet.field term %}">{{ term }}</a> ({{ count }})</li>
+          <li><a href="/{{ facet.field }}/{{ term }}">{{ term }}</a> ({{ count }})</li>
         {% endfor %}
       </ul>
     </div>

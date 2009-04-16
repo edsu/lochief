@@ -22,6 +22,15 @@ urlpatterns = patterns('kochief.discovery.views',
     url(r'^$', 'index', name='discovery-index'),
     url(r'^record/(.+)$', 'record', name='discovery-record'),
     url(r'^search$', 'search', name='discovery-search'),
+    
+    url(r'^language/(?P<token>[\sa-zA-Z0-9:._-]+)$', 'language',
+        name='language'),
+    url(r'^subject/(?P<token>[\sa-zA-Z0-9:._-]+)$', 'subject',
+        name='subject'),
+    url(r'^personal_name/(?P<token>[\sa-zA-Z0-9:._-]+)$', 'personal_name',
+        name='personal_name'),
+        
+        
     url(r'^unapi$', 'unapi', name='discovery-unapi'),
     #(r'^feed/atom/$', 'atomFeed'),
     #(r'^feed/rss/$', 'rssFeed'),

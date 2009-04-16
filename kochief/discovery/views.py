@@ -28,6 +28,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, Http404
+from django.shortcuts import render_to_response
 from django.template import loader, RequestContext
 from django.utils import simplejson
 from django.utils.encoding import iri_to_uri
@@ -90,6 +91,29 @@ def search(request):
     context['MAJAX_URL'] = settings.MAJAX_URL
     template = loader.get_template('discovery/search.html')
     return HttpResponse(template.render(context))
+
+
+def language(request, token=''):
+    return concept(request, field='language', token=token)
+
+def personal_name(request, token=''):
+    return concept(request, field='personal_name', token=token)
+
+def subject(request, token=''):
+    return concept(request, field='subject', token=token)
+
+@vary_on_headers('accept-language', 'accept-encoding')
+def concept(request, field='', token=''):
+    context = RequestContext(request)
+    if request.GET.get('history'):
+        template = loader.get_template('discovery/search_history.html')
+        return HttpResponse(template.render(context))
+    context.update(get_search_results(request, concept_field=field, 
+        concept_token=token))
+    context['ILS'] = settings.ILS
+    context['MAJAX_URL'] = settings.MAJAX_URL
+    return render_to_response('discovery/search.html', context)
+
 
 @vary_on_headers('accept-language', 'accept-encoding')
 def record(request, record_id):
@@ -236,7 +260,7 @@ def pull_power(query):
     """
     Pulls "power search" parts out of the query.  It returns
     (1) the query without those parts and (2) a list of those parts.
-
+    
     >>> query = 'title:"tar baby" "toni morrison" -topic:(dogs justice) fiction "the book:an adventure" +author:john'
     >>> pull_power(query)
     (' "toni morrison"  fiction "the book:an adventure" ', ['title:"tar baby"', '-topic:(dogs justice)', '+author:john'])
@@ -270,7 +294,7 @@ def get_solr_response(params):
         raise ValueError, 'Solr response was not a JSON object.'
     return url, response
 
-def get_search_results(request): 
+def get_search_results(request, concept_field='', concept_token=''): 
     query = request.GET.get('q', '')
     page_str = request.GET.get('page')
     try:
@@ -306,6 +330,10 @@ def get_search_results(request):
     else:
         params.append(('q', powerless_query.encode('utf8')))
         context['current_sort'] = _('relevance')
+    # In case of a concept search
+    if concept_field and concept_token:
+        field_queries.append('%s:"%s"' % (concept_field, concept_token))
+    print "FIELD_QUERIES", field_queries
     for field_query in field_queries:
         params.append(('fq', field_query.encode('utf8')))
     limits_param = request.GET.get('limits', '')
